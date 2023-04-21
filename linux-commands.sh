@@ -266,6 +266,22 @@ PasswordAuthentication no
 # restart ssh service, for changes to take place
 sudo service ssh restart
 
+# Strict Host Key Checking
+# In host key checking, ssh automatically maintains and checks a database containing identification for all hosts it has ever been used with. Host keys 
+# are stored in ~/.ssh/known_hosts in the user's home directory. Additionally, the /etc/ssh/ssh_known_hosts file is automatically checked for known hosts. 
+# Any new hosts can be automatically added to the user's file. If a host's identification changes, ssh warns about this and disables password 
+# authentication to prevent server spoofing or man-in-the-middle attacks, which could otherwise be used to circumvent the encryption. 
+
+# As long as strict host key checking is enabled, the SSH client connects only to SSH hosts listed in the known host list. It rejects all other SSH hosts
+
+# The ssh_config keyword "StrictHostKeyChecking" can be used to control logins to machines whose host key is not known or has changed
+# to disable it while running ssh command
+ssh -o StrictHostKeyChecking=no yourHardenedHost.com
+
+# to do it ~/.ssh/config to make it permenant
+Host *
+    StrictHostKeyChecking no
+    
 
 # .bash_profile  and  .bashrc
 # this allows us to customize our terminal based on our liking
