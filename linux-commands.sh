@@ -323,13 +323,23 @@ nslookup -type=mx yahoo.com  #  Mail Exchange server data
 # upload file from commandline via FTP or SSH
 scp <file to upload> <username>@<hostname>:<destination path>
 
-
 #!  is called bash SheBang, is used to tell the operating system which interpreter to use to parse the rest of the file.
 #!/bin/bash - Uses bash to parse the file.
 #!/usr/bin/python Executes the file using the python binary.
 # If a shebang is not specified and the user running the Bash script is using another Shell the script will be parsed by whatever the default interpreter is used by that Shell
 
-
+# journalctl saves all the logs that have been generated in the system
+journalctl # shows all the logs, press shift+d to go to the end
+journalctl --help
+# show the last 5 lines of the logs
+journalctl -n 5
+# this is where the temporary logs are saved
+cd /run/log/journal
+# here you can edit to save the logs or delete them by each system restart
+vi /etc/systemd/journal.conf
+# set storage to persistent
+[Journal]
+Storage=persistent
 
 
 
