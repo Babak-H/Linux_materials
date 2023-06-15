@@ -342,6 +342,85 @@ vi /etc/systemd/journal.conf
 Storage=persistent
 
 
+firmware is the software on your hardware which runs it, its the lowest level software running on the hardware
+BIOS was the old firmware of the computer hardware
+UEFI the new version of firmware for computers, installed /boot folder in linux
+
+/sys is the folder with all the operating system related stuff
+            block  bus  class  dev  devices  firmware  fs  hypervisor  kernel  module  power
+block => has all the hard drives
+/sys/bus/cpu/devices => here you can see all the CPUs available to the OS
+
+/dev contains all devices related folder, all added devices are visible here
+
+/proc this directory contains info related to processes of the machine, the numbers in this folders are the processes being run
+
+$ lsusb => how many usb devices are attached to this machine
+
+$ lspci => what hardware devices (cpu, isa bridge, vga graphics card,..) are attached to this machine
+
+$ lsblock => the hdd,sdd and ram that are attached to this device
+
+$ lshw => shows all hardware and firmwares on this machine
+
+when linux machine is booting up, you can see all the logs related to kernel booting up
+
+$dmesg  => shows all the logs related to system booting up, they are located at /var/log/dmesg
+
+each hard drive is divided to partitions, in linux devices are defined at /dev , /dev/sda1 , /dev/sda2 ,... 
+the sda1 and sda2 partitions are mounted at /dev folder at /sda and /sdb folders.  
+$ fdisk /dev/sda => this command will open sda hard disk in fdisk software to change or view partitions
+
+$ sudo mount | grep sda  => shows all partitions for sda disk
+
+LVM => Logical Volume Management, is used for cases when you need to resize the partitions.
+via LVM you can add up several physical drives to one bigger virtual drive (Volume Group) that itself can be partitioned.
+
+you have to put around 1GB of hard disk aside for the /boot folder, where kernel is located at.
+
+partition design for server machine:
+
+total : 1TB
+swap: ram+2gb | /boot 1gb | /var 30 gb for server logs | /home 900gb | /usr 20 gb
+
+$ jobs => shows all paused processes
+
+Ctrl+C => aborts the current foreground process
+Ctrl+Z => pauses/stops current foreground process, it can be resumed later
+
+if a parent process dies, all the child processes die with it too.
+
+nohup => allows your child process to live, even when parent process dies.
+
+the process below wont die even when you close the shell:
+$ nohup ping 4.4.5.1  => appending output to nohup.out
+
+$ nohup script.sh > mynohup.out 2>&1 &
+
+    nohup script.sh => run this script with nohup (don't kill it when we close the shell)
+    > mynohup.out => put the output in the mynohup.out file
+    2>&1 => also put the errors in mynohup.out file
+    & => run it in the background
+
+
+$ kill -1 PROCESS_ID  => HUP tell the process that the shell that is controlling it is dead
+$ kill -15 PROCESS_ID => TERM ask process to terminate (this is default signal)
+$ kill -9 PROCESS_ID  => KILL forcefully kills the process
+
+$ pkill pyt => kill all processes that contain the word "pyt" in their name
+
+$ ps => PID TTY TIME CMD
+    PID => ID of the process
+    TTY => from which terminal its running
+    TIME => how much time it borrows from the cpu
+    CMd => with what command it started running
+
+$ ps -e => shows all processes currently running on this machine
+$ ps -e | wc -l
+
+$ pgrep calc | xargs kill => find all processes that contain the word "calc", then kill them all
+
+
 
 
 
