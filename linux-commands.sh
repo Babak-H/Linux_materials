@@ -463,7 +463,7 @@ $ find /etc -iname "*vmware*" => find all files and directories that contain "vm
 
 $ locate aws => find files that contain "aws" in their name, its faster than find, but is based on databse that is updated once per day
 
-
+** the shell setting are usaually located at "/etc/profile" and at "/home/USERNAME/.bashrc"
 
 
 
