@@ -420,6 +420,48 @@ $ ps -e | wc -l
 
 $ pgrep calc | xargs kill => find all processes that contain the word "calc", then kill them all
 
+$ top => shows all the processes, sorts them based on cpu usage, press "q" to quit top
+
+$ free => shows total memory, used and free and total SWAP used and free
+
+$ uptime => how long the system has been up (not restarted) : 16:12  up 16 days,  2:45, 2 users, load averages: 2.23 2.19 2.11
+
+$ watch COMMAND
+$ watch df -h => run this command every 2 seconds and show the new result
+$ watch df -h | grep sda
+
+** link in linux is similar to shortcut on windows OS
+softLink => only points to the original file like shortcut, will not work if the main file is deleted,  it changes when you edit the original file
+
+hardLink => is a full copy of the file, still works if you delete the original, it changes when you edit the original file.
+
+$ ln myfile hard_link => creates a hard link named hard_link
+$ ls -i => you can see both original and hard link point to same inode
+$ unlink hard_link => delete the link 
+
+$ ln -s myfile soft_link => creates a soft link
+$ unlink soft_link
+
+** softLink is much more common than hardLink
+
+$ find / -type l => find all links in the whole system
+
+as we can see when we run the command python3, it is a soft link to python3.10
+$ which python3
+    /Applications/miniconda3/bin/python3
+$ ls -l /Applications/miniconda3/bin/python3
+    lrwxr-xr-x  1 babakhabibnejad  staff  10 Mar 24 16:55 /Applications/miniconda3/bin/python3 -> python3.10
+
+$ echo $PATH => this variable contains all locations that shell commands are saved at.
+    /Applications/miniconda3/bin:/Applications/miniconda3/condabin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+export PATH=$PATH:/usr/new/dir => add a new directory to the PATH variable
+
+$ which ping => this command shows where the command "ping" is saved at : /sbin/ping
+
+$ find /etc -iname "*vmware*" => find all files and directories that contain "vmware" in their name, -iname is case insensitive
+
+$ locate aws => find files that contain "aws" in their name, its faster than find, but is based on databse that is updated once per day
 
 
 
