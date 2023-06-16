@@ -491,7 +491,14 @@ $ locate aws => find files that contain "aws" in their name, its faster than fin
 
 ** the shell setting are usaually located at "/etc/profile" and at "/home/USERNAME/.bashrc"
 
+// how the GUI in linux works:
+Hardware => Kernel => Display Server => Desktop Manager, (Gnome, KDE,..) => User
+                                        Window Manager, OpenBox, i3,.. (this is smaller in size) => User
 
+KDE => Arch linux, RedHat 
+Gnone => Ubuntu
 
-
-
+// how to do visual ssh into gui
+in target machine at "/etc/ssh/sshd_config" set "X11Forwarding" to "yes", then connect to ssh like this:
+$ ssh -X server_ip.address.net
+$ call_some_gui_app
