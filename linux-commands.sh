@@ -502,3 +502,51 @@ Gnone => Ubuntu
 in target machine at "/etc/ssh/sshd_config" set "X11Forwarding" to "yes", then connect to ssh like this:
 $ ssh -X server_ip.address.net
 $ call_some_gui_app
+
+# cron can be installed from crontab package, each user has his own crons
+
+M (minute)  H (hour) DOM (day of month) MON (month) DOW (day of week) command
+42          3        1                  *           *                 /root/backup.sh  # run it first day of each month at 3:42 am
+42          3        *                  *           *                 /root/backup.sh  # run it everyday at 3:42 am
+*/15        */2      *                  *           *                  /root/backup.sh  # run it everyday 0:0 0:15, 0:30, 0:45, 2:0 2:15,...
+30          *        *                  *            1,7              /root/backup.sh # run it on sunday and saturday, at middle of every hour
+$ crontab -l => shows all crons 
+$ crontab -r => remove all crons
+
+$ crontab -e => create crons in the file that opens:
+
+        42    3     1   *   *   /root/backup.sh >> $HOME/tmp/backup.log 2>&1
+        */15  */2   *   *   *   /root/backup.sh >> $HOME/tmp/daily/backup.log 2>&1
+        1      0    30  *   *   /var/www/check-server.sh >> /dev/null 2>&1   # throws the logs away
+
+# cron files are saved at: /var/spool/cron/tabs/username
+
+# only use one of these files:
+/etc/cron.allow # if you add a user here, only that user can use cron.
+/etc/cron.deny  # the user that is added here can't use cron.
+
+
+# systemd  and  systemd-run
+# to run a service located at /etc/systemd/system/backup.service we add this file: /etc/systemd/system/backup.timer:
+
+    [Unit]
+    Description=run the backup service first saturday of every month
+
+    [Timer]
+    onCalendar=Sat *-*-1..7 2:42:00  # Day-of-week, Month, Year, which day of month, hour:minute:second
+    Persistent=true
+
+    [Install]
+    WantedBy=timers.target
+
+# the result of systemd (logs) are saved at journalctl
+
+# to check all systemd timers:
+systemctl list-timers
+
+# you can also run systemd timers via a terminal command
+# run the test-serv service every two hours
+systemd-run --on-active="2hours" --unit="my-test-serv.service"
+
+# run the test-script.sh every three hours
+systemd-run --on-active="3hours" /usr/local/bin/test-script.sh
