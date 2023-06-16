@@ -165,6 +165,32 @@ passwd 123456789
 # userdel
 sudo userdel John
 
+// creates a new user, creates new group with same name and adds user to that group and create homedir or /home/new_user
+adduser new_user
+// asks for password
+// asks for person's name (can be set to default)
+
+usermod -aG new_group username // add user to a new group
+usermod -aG sudo my_user
+
+usermod -L username  // lock account
+usermod -U username  // unlock account
+
+// add new group with gid of 1111, for normal users and groups, it usually starts from 1000 and upward for uid and gid
+groupadd -g 1200 mynewgroup
+// edit the group
+groupmod -g 1345 mynewgroup
+groupdel mynewgroup
+
+// shows info about all users
+$ head /etc/passwd  => username:group:password (here only shows x):gid:extra_info:/home/username:shell-format (for example /bin/bash)
+
+$ cat /etc/shadow   => username:password (if it is * then user doesnt have a password):days_since_last_change:days_until_expire:days_until_expire_warning:days_until_disable:days_until_disable_warning
+
+$ chage -l username => shows info about password expiration
+
+$ id username => shows info about user and its groups
+
 # apt-get
 sudo apt-get update
 sudo apt-get upgrade
