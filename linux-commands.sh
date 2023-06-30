@@ -550,3 +550,31 @@ systemd-run --on-active="2hours" --unit="my-test-serv.service"
 
 # run the test-script.sh every three hours
 systemd-run --on-active="3hours" /usr/local/bin/test-script.sh
+
+# time in linux systems
+# each computer itself has an internal clock that works even when it is shut down, that is called the hardware clock
+# NTP => Network Time Protocol , there are servers for computer to connect to and get the correct time
+
+# set the system clock
+sudo ntpdate pool.ntp.org 
+
+# set the hardware clock of the computer
+sudo hwclock -w -u
+
+# another way
+apt install ntp
+systemctl start ntp
+
+cat /etc/ntp.conf
+
+# chrony is another implementation of NTP, for less serious machines 
+chronyc tracking # shows you whats happening
+
+# change system's date
+sudo date -s "Jan 22 22:22:22 2022"
+
+# show what timezone we are using
+cat /etc/timezone
+
+# change your timezone to Tokyo
+sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
