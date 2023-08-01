@@ -578,3 +578,41 @@ cat /etc/timezone
 
 # change your timezone to Tokyo
 sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+
+PSSH: Parallel SSH connections
+
+# install pssh
+sudo apt-get install pssh -y
+
+# create a hosts file
+vi sshhosts
+'''
+    192.168.1.70
+    192.168.1.71
+    192.168.1.72
+    192.168.1.73
+'''
+
+# in case the usernames aren't same
+'''
+    user1@192.168.1.70
+    user2@192.168.1.71
+    userX@192.168.1.72
+    user5@192.168.1.73
+'''
+
+# we want to run df -h on all hosts
+# all of them need to have same username and password for ssh
+# -A : prompts for remote password
+# -i : Display standard output and standard error as each host completes, (inline)
+# -h : Read hosts from the given host_file
+# sshhosts : named of the host_file
+parallel-ssh -A -i -h sshhosts df -h
+
+
+# used to run the Bash shell with elevated privileges using the "sudo" command
+# -E : option preserves the user environment variables when running the command as the superuser
+# bash : indicates that the Bash shell should be launched
+# - : is typically used to read commands from standard input
+sudo -E bash - 
