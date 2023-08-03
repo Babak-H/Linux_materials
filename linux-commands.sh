@@ -616,3 +616,7 @@ parallel-ssh -A -i -h sshhosts df -h
 # bash : indicates that the Bash shell should be launched
 # - : is typically used to read commands from standard input
 sudo -E bash - 
+
+# A-Record : An A record maps a domain name to the IP address (Version 4) of the computer hosting the domain. An A record uses a domain name to find the IP address of a computer connected to the internet
+# The A in A record stands for Address. Whenever you visit a web site, send an email, connect to Twitter or Facebook, or do almost anything on the Internet, the address you enter is a series of words connected with dots.
+#  to access the DNSimple website you enter www.dnsimple.com. At our name server, there’s an A record that points to the IP address 208.93.64.253
