@@ -1,0 +1,354 @@
+**** how to reboot a elasticsearch cluster ****
+a. allow primaries allocation:
+    PUT _cluster/settings
+        {
+        "persistent": {
+            "cluster.routing.allocation.enable": "primaries"
+        }
+    }
+
+b. reboot from the server's machine (via ssh):  sudo reboot
+
+c. make sure elasticsearch is running: 
+    $ service elasticsearch status  / service elasticsearch start
+
+c. revert back allocation changes:
+    PUT _cluster/settings
+        {
+        "persistent": {
+            "cluster.routing.allocation.enable": null
+        }
+    }
+
+show all kibana nodes:
+GET _cat/nodes
+
+GET _cat/indices?v
+
+how to run OS patching: $ /liveperson/code/lputils/linux/os_patches/lpospatching.sh -y
+
+run several server patches all at once:
+$ pssh -h servers.in -t 600 -i '/liveperson/code/lpospatching.sh -y'
+
+$ find / -type f -iname elasticsearch.yml
+$ find / -type f -iname Prometheus.yaml
+
+- node exporter:
+$ curl lpgcen-q-elscb-usea1-2:14300/metrics | grep -v '#' | grep cpu
+
+- node exporter metrics:
+$ curl lpgcen-q-elscb-usea1-2:9114/metrics | grep -v '#'
+
+-  GREP => -v, --invert-match, select non-matching lines
+
+$ /etc/systemd/system/node_exporter.service
+$ /etc/systemd/system/elasticsearch_exporter.servicec
+$ /etc/grafana-agent.yaml 
+
+
+**** how to backup NFS drive *****
+We need to unmount existing NFS and mount cohesity drive on each data and master node of these clusters
+
+create new dir: $ mkdir -p /liveperson/data/elasticsearch_backup1
+
+unmount existing nfs: $ umount /liveperson/data/elasticsearch_backup
+
+mount old nfs to new directory: $ mount -t nfs 172.16.22.1:/vol/els_prod_backup/elasticsearch_intentanalyzer /liveperson/data/elasticsearch_backup1
+
+Verify the new mount: $ df -h | grep elasticsearch_backup1
+
+Mount Cohecity NFS appliance to old dir and verify the mounts:
+$ mount -t nfs va-cohesity.lpdomain.com:/es_va_prod_v7.8_intent /liveperson/data/elasticsearch_backup
+$ df -h | grep elasticsearch_backup
+
+make new entry to fstab file (comment old nfs line):
+$ vi etc/fstab
+$ va-cohesity.lpdomain.com:/es_va_prod_v7.8_intent   /liveperson/data/elasticsearch_backup nfs defaults 0 0
+
+
+**** Run / Open VSCode from Mac Terminal *****
+Open Visual Studio Code
+Open the command pallette with Command + Shift + P
+Type Shell in command palette
+Select Shell Command: Install code in PATH
+Now open your terminal type: $ code .
+
+***** How to do a Diff in VS Code (Compare Files) *****
+1. Right click the first file and "Select for Compare"
+2. Right click on the second file and "Compare with Selected"
+3. You should see the diff panel appear once you've completed these steps
+
+***** to see how different elasticsearch service work *****
+$ service elasticsearch status
+$ service elasticsearch_exporter status
+$ service grafana-agent status
+$ service node_exporter status
+
+$ systemctl daemon-reload
+$ systemctl restart kibana
+
+**** login to Kubernetes Cluster via OIDC *****
+$ curl -s -L https://artifactory.int.liveperson.net/artifactory/lp-artifact/k8s-oidc-client/k8s-oidc-client-init.sh | bash
+$ k8s-oidc-client --dev
+    # or
+$ k8s-oidc-client --dev --web-login
+$ kubectl config get-contexts
+
+- install Kubernets and Helm on MacOS:
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/arm64/kubectl"
+$ chmod +x ./kubectl
+$ sudo mv ./kubectl /usr/local/bin/kubectl
+$ sudo chown root: /usr/local/bin/kubectl
+$ kubectl version --client
+    
+$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+$ brew tap hashicorp/tap
+$ brew install hashicorp/tap/terraform
+$ brew update
+$ brew upgrade hashicorp/tap/terraform
+$ touch ~/.bashrc
+$ terraform -install-autocomplete
+    
+$ brew install kind
+$ kind create cluster
+    
+$ brew install helm
+$ helm --version
+    
+$ brew install ansible 
+$ ansible --version
+
+install our helm template:
+$ helm install -f values/alpha.yml chart_name given_name
+
+**** Terraform tips *****
+- Terraform only works when you merge branches into main branch
+- Always follow naming convention when creating resources in terraform
+- CICD pipeline : terraform -> ansible call for dynamic inventory
+- In the compute instance make code_disk and data_disk a module
+  In the compute instance make static ip a module
+  Terraform lint tests
+  Ansible dynamic inventory GCP
+
+  Terraform GCP project instruction:
+- main folder 
+  backend.tf => remote backend
+  main.tf => include "computeInstance" module and "lp_project_apis" remote module
+  providers.tf => gcp provider
+  varibales.tf => variables defined
+  versions.tf , outputs.tf => empty for now
+
+- config folder
+  main.tf => create kafka and zookeeper instances (based on computeinstance module) and logSink (google_logging_project_sink) based on remote module
+  outputs.tf => varibales (ip address) that can be used in other modules
+
+- modules/compute_instance folder
+  main.tf => create a virtual machine with two (code, data) external storages and static ip
+  variables.tf => list of variables for compute_instance, used to customize module in config/main
+  outputs.tf => varibales that can be used in other modules
+
+- VMs defined in modules/compute_instance
+- several instances created in config/ as modules
+- everything is added up in main/ folder
+
+// In Terraform, the element() function is used to retrieve a single element from a list by its index. The syntax for this function is as follows:
+# element(list, index)
+
+locals {
+    my_list = ["a", "b", "c"]
+    second_element = element(local.my_list, 1)
+}
+
+output "second_element" {
+    value = local.second_element
+}
+
+**** GitLab *****
+Project -> add member
+Add project to the group, then all group members get added to the project
+Add new users to db engineering group, use the role besides "guest" to add user.
+Add people to this group: "Gitlab Database group"
+
+**** Ansible *****
+- name: create password for elk cluster
+  ansible.builtin.shell: bin/elasticsearch-setup-passwords auto -u "http://localhost:9201"
+  register: elk_password
+
+*** execute specific role from command line (use tags)
+roles:
+    - {role: 'mysql', tags: 'mysql'}
+    - {role: 'apache', tags: 'apache'}
+
+$ ansible-playbook webserver.yml --tags "apache"
+
+*** How to run only one task in ansible playbook?
+tasks:
+    - yum: name={{ item }} state=installed
+      with_items:
+         - httpd
+         - memcached
+      tags:
+         - packages
+
+    - template: src=templates/src.j2 dest=/etc/foo.conf
+      tags:
+         - configuration
+
+$ ansible-playbook example.yml --tags "configuration,packages"
+$ ansible-playbook example.yml --skip-tags "notification"
+
+*** Store command's stdout in new variable?
+- shell: cat "hello"
+  register: cat_contents
+
+- shell: echo "I cat hello"
+  when: cat_contents.stdout == "hello"
+
+*** Override hosts variable of Ansible playbook from the command line
+hosts: "{{ variable_host | default('web') }}"
+
+// if the variable_host is not provided, it will pick the default "web" host
+$ ansible-playbook server.yml --extra-vars "variable_host=newtarget(s)"
+
+*** ansible special variables => These variables cannot be set directly by the user; Ansible will always override them to reflect internal state: ansible_collection_name, play_hosts, hostvars,....
+https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html#term-ansible_play_batch
+
+*** with_items => this lookup returns a list of items given to it, if any of the top level items is also a list it will flatten it, but it will not recurse
+
+- name: add several users
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: "wheel"
+    state: present
+  with_items:
+     - testuser1
+     - testuser2
+     - testuser3
+
+*** ansible Dynamic Inventory for GCP: https://devopscube.com/ansible-dymanic-inventry-google-cloud/
+
+*** ansible.builtin.expect => The expect module executes a command and responds to prompts. The given command will be executed on all selected nodes. It will not be processed through the shell, so variables like $HOME and operations like "<", ">", "|", and "&" will not work.
+
+- name: Case insensitive password string match
+  ansible.builtin.expect:
+    command: passwd username
+    responses:
+      (?i)password: "MySekretPa$$word"
+  # you don't want to show passwords in your logs
+  no_log: true
+
+***** AWS install kinesis Agent *****
+// install kinesis agent
+$ sudo yum install –y aws-kinesis-agent
+
+// edit the agent file
+$ sudo vim /etc/aws-kinesis/agent.json
+
+ {
+         "cloudwatch.emitMetrics": true,
+         "kinesis.endpoint": "",
+         "firehose.endpoint": "",
+         "flows": [{
+                 "filePattern": "/tmp/logs/access_log*",
+                 "deliveryStream": "web-log-ingestion-stream",
+                 "dataProcessingOptions": [{
+                         "optionName": "LOGTOJSON",
+                         "logFormat": "COMMONAPACHELOG"
+                 }]
+         }]
+ }
+
+// start the kinesis agent
+$ sudo service aws-kinesis-agent start
+
+**** GCP Snapshot *****
+gcp snapshot => to back up persistent disks in gcp
+can be scheduled per day or week,...
+snapshot can be regional or multi-regional (can be stored in same region as disk or in several regions)
+
+manual snapshot
+scheduled snapshot
+
+** Manual **
+in GUI => go to VM => go to disk that you want to backup => click "create snapshot"
+                                                                - snapshot name
+                                                                - source disk
+                                                                - location: region /multi-region
+
+
+$ gcloud compute snapshots create proxysql-test-snapshot-1 --project=lpgprj-b2b-p-mysql-us-01 --source-disk=lpgmysql-proxysql-p-useast1b-001-code --source-disk-zone=us-east1-b --storage-location=us
+
+
+** Scheduled **
+go to snapshot tab => click "Create a snapshot schedule" => - scheduled snapshot name
+                                                            - region (should be same region as the disk)
+                                                            - location: region /multi-region
+                                                            - schedule frequency: hourly/daily/weekly
+                                                            - start time: day-of-week/hour
+                                                            - auto delete after: 14days
+                                                            - delete snapshot after deleting the orignal disk: yes/no
+
+
+// weekly
+$ gcloud compute resource-policies create snapshot-schedule proxysql-scheduled-snapshot-1 --project=lpgprj-b2b-p-mysql-us-01 --region=us-east1 --max-retention-days=14 --on-source-disk-delete=keep-auto-snapshots --weekly-schedule-from-file=SCHEDULE_FILE_PATH --storage-location=us-east1
+
+// daily
+$ gcloud compute resource-policies create snapshot-schedule proxysql-scheduled-snapshot-2 --project=lpgprj-b2b-p-mysql-us-01 --region=us-east1 --max-retention-days=14 --on-source-disk-delete=keep-auto-snapshots --daily-schedule --start-time=07:00 --storage-location=us-east1
+
+** add disk to scheduled snapshots **
+go to disks => select the target disk => click edit => select the "snapshot schedule" and save
+
+$ gcloud compute disks add-resource-policies lpgmysql-proxysql-p-useast1b-001-code --resource-policies proxysql-scheduled-snapshot-2 --zone us-east1-b
+
+* create disk from snapshot *
+- name
+- location: single zone / regional
+- source : the snapshot source
+- disk type
+- size (set same as disk size)
+- enable schedule (so new disk can also be snapshoted via schedule)
+- encyption: google managed / customer managed
+
+$ gcloud compute disks create disk-from-snapshot-test-1 --project=lpgprj-b2b-p-mysql-us-01 --type=pd-standard --size=100GB --resource-policies=projects/lpgprj-b2b-p-mysql-us-01/regions/us-east1/resourcePolicies/proxysql-scheduled-snapshot --zone=us-east1-b --source-snapshot=projects/lpgprj-b2b-p-mysql-us-01/global/snapshots/proxysql-test-snapshot-1
+
+
+* attach disk to machine *
+go to instance => click edit => Additional disks: attach existing disk => select the disk and click save
+
+$ gcloud compute instances attach-disk lpgmysql-proxysql-p-useast1b-001 --disk disk-from-snapshot-test-1
+
+
+**** show linux folder in details ****
+$ ls -lhrt /liveperson/data
+
+*** show all mysql users ***
+$ mysql
+$ select user,host from mysql.user;
+
+
+*** AWS Session Manager ***
+# start ssm session into the ec2 instance, activate portForwarding with port 80 to port 8080
+$ aws ssm start-session \
+  --target i-1234f3432jj07f \
+  --document-name AWS-StartPortForwardingSession \
+  --parameters '{"portNumber":["80"], "localPortNumber":["8080"]}'
+
+# to use SSM we need aws policy name "AmazonSSMFullAccess" attached to our role
+# to attach this role to an ec2 instance, we need to have session manager installed
+# ec2 instance should also have access to internet (public subnet or nat gateway)
+# session manager doesnt need any port to be open
+# the ec2 instance needs to have tag: key: "service" value: "proxy"
+# when we start the above ec2, it will be visible under SSM => session manager page
+
+*** mount extrnal HDD to linux machine
+see if there is an entry in the disk list: $ sudo fdisk -l 
+mount it: $ sudo mount -t ntfs /dev/sdb1 /media 
+* ntfs is name of the hdd drive
+
+
+
+
+
+
+
