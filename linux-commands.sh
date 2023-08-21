@@ -354,6 +354,25 @@ scp <file to upload> <username>@<hostname>:<destination path>
 #!/usr/bin/python Executes the file using the python binary.
 # If a shebang is not specified and the user running the Bash script is using another Shell the script will be parsed by whatever the default interpreter is used by that Shell
 
+
+rsyslog => the most recent log server on linux machines
+/dev/log => applications always write to dev/log their information
+/var/log/ => almost all the logs go here
+
+$ dmesg | less => shows the logs for when the machine is booting up
+
+$ cd /var/log
+$ ls -ltrh  => shows the logs by time order, to see the last one that was created
+
+logrotate => it can optimize logs, you can create new log file, delete previous logs and zip log files
+$ vi /etc/logrotate.conf
+
+$ cd /etc/cron.daily/ => here you can see that logrotate is being run everyday
+
+/var/log/auth.log => all logs related to authentication
+/var/log/lastlog => date and time of all recent user logins
+
+
 # journalctl saves all the logs that have been generated in the system
 journalctl # shows all the logs, press shift+d to go to the end
 journalctl --help
@@ -366,6 +385,13 @@ vi /etc/systemd/journal.conf
 # set storage to persistent
 [Journal]
 Storage=persistent
+
+
+$ journalctl -e  => automatically go to the end of the logs
+$ journalctl -f => goes to the last line of the logs and updates it if new log is added
+$ journalctl -u ssh => shows all logs related to ssh
+$ journalctl -u ssh --since yesterday
+$ journalctl --since "09:00:00" --until "11:00:00" 
 
 
 firmware is the software on your hardware which runs it, its the lowest level software running on the hardware
