@@ -978,15 +978,17 @@ cat /etc/resolv.conf  # local DNS file
 
 cat /etc/nsswitch.conf  # the order of how the command will access different processes
     passwd:  files systemd  # first ask files, then systemd for passwd command
-
-
+    
 ping x.x.x.x -i 5 # ping the ip address each 5 seconds
 ip route # shows the routing table of the system (works same as AWS route tables)
 traceroute 4.2.2.4  # trace from which ip it starts to end up connecting to this ip (for example for ping)
+
 netstat -nr # shows the routing table
 netstat -na # shows all the active ports on the machine (for both internet connections and unix sockets)
 nc -l 1337 # nc : netcat , shows all the connections on port 1377 on this machine
+
 # dig : is a DNS lookup tool, checks how a domain name can be resolved to IPs
 dig google.com
 tcpdump  # shows all the tcp connections passing through this machine
+
 tcpflow -c port 80  # shows all connections to port 80 of this machine
