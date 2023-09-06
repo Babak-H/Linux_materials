@@ -946,3 +946,47 @@ sudo printf "USERNAME:$(openssl passwd PASSWORD)\n" | sudo tee -a /etc/squid/htp
 sudo systemctl restart squid
 
 # 11. Configure Postman to use Proxy Auth (Settings then Proxy). Fill in Username and Password, then repeat the step 6
+
+'''
+***** Networking *****
+'''
+# NIC : network interface card
+# wlan0 , eno1 , ens1, enp3s2  : linux detects several nic cards on a machine.
+ip link show # view all network cards
+apt install net-tools # install ifconfig
+ifconfig # detailed info about each network card
+ifconfig NETWORK_CARD down  # shuts down the nic from hardware level
+
+cd /etc/network/interfaces  # networking settings are here
+ip addr show
+ip route add default via 192.168.1.1  # add the default gateway to connect to outside world
+nmcli general status  # shows the status of the network connections
+nmcli device  # shows all network devices
+
+hostname  # shows name of the machine
+cat /etc/hostname
+hostnamectl set-hostname babak  # change the machines name
+
+vim /etc/hosts  # how to set another machines ip to custom name
+
+    172.167.2.45 dummyhost
+    127.0.0.1 gaming.ir  # if some user tries to access that website, it will fail, since we set it to local address
+
+ping dummyhost
+
+cat /etc/resolv.conf  # local DNS file
+
+cat /etc/nsswitch.conf  # the order of how the command will access different processes
+    passwd:  files systemd  # first ask files, then systemd for passwd command
+
+
+ping x.x.x.x -i 5 # ping the ip address each 5 seconds
+ip route # shows the routing table of the system (works same as AWS route tables)
+traceroute 4.2.2.4  # trace from which ip it starts to end up connecting to this ip (for example for ping)
+netstat -nr # shows the routing table
+netstat -na # shows all the active ports on the machine (for both internet connections and unix sockets)
+nc -l 1337 # nc : netcat , shows all the connections on port 1377 on this machine
+# dig : is a DNS lookup tool, checks how a domain name can be resolved to IPs
+dig google.com
+tcpdump  # shows all the tcp connections passing through this machine
+tcpflow -c port 80  # shows all connections to port 80 of this machine
