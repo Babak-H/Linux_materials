@@ -646,6 +646,15 @@ sudo -E bash -
 # A-Record : An A record maps a domain name to the IP address (Version 4) of the computer hosting the domain. An A record uses a domain name to find the IP address of a computer connected to the internet
 # The A in A record stands for Address. Whenever you visit a web site, send an email, connect to Twitter or Facebook, or do almost anything on the Internet, the address you enter is a series of words connected with dots.
 #  to access the DNSimple website you enter www.dnsimple.com. At our name server, there’s an A record that points to the IP address 208.93.64.253
+# DNS record types
+# A-record => ipv4 address for a host
+# AAAA-record => ipv6 address for a host
+# MX-record => mail server address for a host
+
+# this is same as 'cat /etc/hosts' , shows the localhost,...
+$ getent hosts localhost
+$ getent hosts
+
 
 $ cat /etc/services  # shows all the ports (and their related services) that the linux machine is using
 
