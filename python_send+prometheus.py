@@ -5,7 +5,7 @@ import json
 import time
 
 md_url = "http://localhost:8008"
-Apikey = "91de39d99ac666a51f78e1f943e2d694c033"
+Apikey = "***************************"
 prefix = "metadefender"
 env = "alpha"
 default_inactive_engines = ["compression_13_windows", "dlp_13_windows", "oesis_13_windows"]
@@ -139,5 +139,5 @@ if __name__ == '__main__':
         write_metrics()
         time.sleep(10)  # Adjust the interval as needed
         
-# curl --request GET --url 'http://localhost:8008/stat/nodes' --header 'apikey:91de39d99ac666a51f78e1f943e2d694c033' | jq
+# curl --request GET --url 'http://localhost:8008/stat/nodes' --header 'apikey:**********************' | jq
 

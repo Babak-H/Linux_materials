@@ -1,3 +1,35 @@
+# linux file permissions
+ls -l  
+
+:'
+drwxrwxr-x 2 babak babak 4096 May 15 12:53 dir
+
+  permissions: d rwx rwx r-x : 
+               d : file type, d stands for directory
+                 rwx : user permissions
+                     rwx: group permissions
+                        r-x: other permissions
+
+2 : number of hard links
+babak : user (owner) name
+babak : group name
+4096 : size
+May 15 12:53 : last update to this file
+dir : file/folder name
+
+
+-rw-rw-r-- 1 zhaleh dev-group 4 July 12 19:21 information.txt
+
+- rw- rw- r--
+- : it is a file
+rw- : zhaleh user can read write
+rw- : dev-group group can read write
+r-- : anyone can read
+
+Read Write eXecute
+r    w      x
+'
+
 # superuser do , elevates user permission to do tasks
 # sudo [command]
 sudo apt-get install my-package # ubuntu
@@ -16,6 +48,9 @@ ls -l    # show as list
 ls -la   # show as list with hidden files
 ls -lah  # also show the size of folders/files
 ls -la >> ls.logs  
+
+# show linux folder in details
+ls -lhrt /liveperson/data
 
 #  >>   appends
 #  >    writes to file and over-writes the file
@@ -202,6 +237,8 @@ vi text.txt
 # su [options] [username [argument]], allows you to run a program as a different user
 su -p babak
 
+sudo su -  # become root user without knowing root's password
+
 # htop
 htop
 htop -d
@@ -328,6 +365,10 @@ echo "$(tput setaf 166)this is orange"
 # divide the lines via "," and only show columns 2 and 3
 cut -d, -f2,3 domains.csv
 
+var = "apple orange"
+# divide by space, then get column 2
+echo $var | cut -d' ' -f2  # orange
+
 # tr , TRanslate
 # replace all the "W" in the file with "j"
 cat my-thesis.txt | tr W j
@@ -419,9 +460,15 @@ when linux machine is booting up, you can see all the logs related to kernel boo
 
 $dmesg  # shows all the logs related to system booting up, they are located at /var/log/dmesg
 
-each hard drive is divided to partitions, in linux devices are defined at /dev , /dev/sda1 , /dev/sda2 ,... 
-the sda1 and sda2 partitions are mounted at /dev folder at /sda and /sdb folders.  
+# each hard drive is divided to partitions, in linux devices are defined at /dev , /dev/sda1 , /dev/sda2 ,... 
+# the sda1 and sda2 partitions are mounted at /dev folder at /sda and /sdb folders.  
 $ fdisk /dev/sda # this command will open sda hard disk in fdisk software to change or view partitions
+
+# mount extrnal HDD to linux machine
+# see if there is an entry in the disk list:
+sudo fdisk -l 
+# mount it: 
+sudo mount -t ntfs /dev/sdb1 /media  # ntfs is name of the hdd drive
 
 $ sudo mount | grep sda  # shows all partitions for sda disk
 
@@ -996,8 +1043,71 @@ netstat -nr # shows the routing table
 netstat -na # shows all the active ports on the machine (for both internet connections and unix sockets)
 nc -l 1337 # nc : netcat , shows all the connections on port 1377 on this machine
 
+sudo fuser 22/tcp  # find out which user is using port 22 (on tcp layer) on this machine
+
 # dig : is a DNS lookup tool, checks how a domain name can be resolved to IPs
 dig google.com
 tcpdump  # shows all the tcp connections passing through this machine
 
 tcpflow -c port 80  # shows all connections to port 80 of this machine
+
+
+# how to run os patching
+./liveperson/code/lputils/linux/os_patches/lpospatching.sh -y
+# run several server patches all at once:
+pssh -h servers.in -t 600 -i '/liveperson/code/lpospatching.sh -y'
+
+# find a file named 'elasticsearch.yml' in the whole machine (start from root /)
+find / -type f -iname elasticsearch.yml
+find / -type f -iname Prometheus.yaml
+
+
+# **** how to backup NFS drive *****
+# We need to unmount existing NFS and mount cohesity drive on each data and master node of these clusters
+
+# create new dir: 
+mkdir -p /liveperson/data/elasticsearch_backup1
+
+# unmount existing nfs:
+umount /liveperson/data/elasticsearch_backup
+
+# mount old nfs to new directory:
+mount -t nfs 172.16.22.1:/vol/els_prod_backup/elasticsearch_intentanalyzer /liveperson/data/elasticsearch_backup1
+
+# Verify the new mount:
+df -h | grep elasticsearch_backup1
+
+# Mount Cohecity NFS appliance to old dir and verify the mounts:
+mount -t nfs va-cohesity.lpdomain.com:/es_va_prod_v7.8_intent /liveperson/data/elasticsearch_backup
+# make sure it exists
+df -h | grep elasticsearch_backup
+
+# make new entry to fstab file (comment old nfs line):
+vi etc/fstab
+va-cohesity.lpdomain.com:/es_va_prod_v7.8_intent   /liveperson/data/elasticsearch_backup nfs defaults 0 0
+
+
+# show all mysql users
+mysql
+select user,host from mysql.user;
+
+
+var="apple orange"
+echo $var    # apple orange
+echo $var | awk '{print $1}'   # apple
+echo $var | awk '{print $2}'   # orange
+
+last # shows the latest logins to the system (which time and user)
+
+
+ulimit # shows how much cpu, ram, memory a user can have inside a machine
+ulimit -a  # show all
+
+cat /etc/security/limits.conf  # how to change resource limits for users
+
+# show all services that are available
+# + service is working
+# - service not used
+sudo service --status-all
+# same as
+systemctl status
