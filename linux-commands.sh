@@ -525,6 +525,24 @@ $ free # shows total memory, used and free and total SWAP used and free
 
 $ uptime # how long the system has been up (not restarted) : 16:12  up 16 days,  2:45, 2 users, load averages: 2.23 2.19 2.11
 
+#### Load Average : can help you detemine if your linux system is keeping up with its workload or becoming slow, it is based on how much cpu we are using (but also related to hard drive I/O metrics)
+
+$ uptime  # shows how long the server has been up for and also gives you load average
+$ cat /proc/loadavg  # also shows the system's current load average
+
+'''
+load average: 0.04, 0.05, 0.07
+
+0.04 => over past one minute
+0.05 => over the past 5 minutes
+0.07 => over the past 15 minutes, this is the most important number
+
+0.00 = server is not being used any hardware
+1.00  = server is running at full capacity (if we have one cpu core), in case of 2 cup cores, the number 2.00 means 100% capacity of the server
+
+$ cat /proc/cpuinfo  # see how many cpu cores we have (starts at 0)
+'''
+
 $ watch COMMAND
 $ watch df -h # run this command every 2 seconds and show the new result
 $ watch df -h | grep sda
