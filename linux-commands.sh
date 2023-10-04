@@ -344,8 +344,24 @@ ssh -o StrictHostKeyChecking=no yourHardenedHost.com
 # to do it ~/.ssh/config to make it permenant
 Host *
     StrictHostKeyChecking no
-    
 
+# how to remove a trusted host from ssh
+ssh-keygen -R 192.168.70.2
+
+'''
+jump server: you can ssh to a machine and from that machine you are allowed to ssh into several other systems.
+
+local -> jump server -> remote machine
+                     -> remote machine
+                     -> remote machine
+
+to use jumpp server we need ssh-agent and ssh-add commands so jump server can use our private ssh-key
+to connect to target servers
+'''
+
+# use ssh to only run one command and then exit the remote host:
+ssh root@5.161.75.09 uptime
+    
 # .bash_profile  and  .bashrc
 # this allows us to customize our terminal based on our liking
 cd ~
