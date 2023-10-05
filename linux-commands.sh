@@ -1145,3 +1145,11 @@ cat /etc/security/limits.conf  # how to change resource limits for users
 sudo service --status-all
 # same as
 systemctl status
+
+# how reduce the size of a log file without losing recent logs (truncate it)
+
+# sets size of the file to zero, makes it empty
+truncate -s 0 logfile
+# this will also empty the file
+cat /dev/null > file.log
+$ tail -c 10M logfile > newlogfile
