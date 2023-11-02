@@ -1154,8 +1154,8 @@ truncate -s 0 logfile
 cat /dev/null > file.log
 $ tail -c 10M logfile > newlogfile
 
-command 1 && command 2  # => This command will execute command 1, and if command 1 exits successfully (returns a zero exit status), it will then execute command 2. In other words, command 2 will only run if command 1 is successful.
 
+command 1 && command 2  # => This command will execute command 1, and if command 1 exits successfully (returns a zero exit status), it will then execute command 2. In other words, command 2 will only run if command 1 is successful.
 command 1 & command 2  # => This command will run command 1 in the background (as a separate process) and immediately start running command 2 in the foreground. command 2 does not wait for command 1 to finish; they run concurrently.
 
 # && ensures that the second command only runs if the first one is successful.
