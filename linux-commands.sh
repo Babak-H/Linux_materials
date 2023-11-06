@@ -479,13 +479,106 @@ sudo mount -t ntfs /dev/sdb1 /media  # ntfs is name of the hdd drive
 
 $ sudo mount | grep sda  # shows all partitions for sda disk
 
-LVM # Logical Volume Management, is used for cases when you need to resize the partitions.
+# *** LVM ***
+# Logical Volume Management, is used for cases when you need to resize the partitions.
 # via LVM you can add up several physical drives to one bigger virtual drive (Volume Group) that itself can be partitioned.
+
+# in linux we have physical volumes, they add up to become a volume group and then we can divide the volume group
+# into logical volumes (LVM) 
+
+physical volume /dev/sda 200 GB =>                          => logical volume 50GB 
+                                    Volume Group 1 400GB
+physical volume /dev/sdb 200 GB =>                          => logical volume 50GB 
+
+babak@DESKTOP-PN1RO4V:~$ lsblk
+NAME MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda    8:0    0 363.3M  1 disk
+sdb    8:16   0     2G  0 disk [SWAP]
+sdc    8:32   0     1T  0 disk /snap
+                               /mnt/wslg/distro
+                               /
+
+# create physical volumes
+pvcreate /dev/xvdf1 /dev/xvdf2
+
+# a physical volume is a collection of disk partitions used to store all server data. physical volumes have a maximum size of 16 TB, because physical volumes can contain any portion
+# of one or more disks, you must specify several characteristics of a physical volume when creating it.
+babak@DESKTOP-PN1RO4V:~$ pvdisplay /dev/sdb1
+  “/dev/sdb1” is a new physical volume of “2.01 GiB”
+  --- NEW Physical volume ---
+  PV Name               /dev/sdb1
+  VG Name
+  PV Size               2.01 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               0FIuq2-LBod-IOWt-8VeN-tglm-Q2ik-rGU2w7
+
+# create a volume group from physical volume
+vgcreate vol_group1 /dev/xvdf1 /dev/xvdf1
+
+# show the details of the volume group
+vgdisplay
+
+# create a logical volume LVM, should be smaller size than the volume group
+lvcreate -n lv01 -L 500MB vol_group1
+# show the volume groups
+lvdisplay
+
+$ sudo lvdisplay Vol1
+  --- Logical volume ---
+  LV Path                 /dev/Vol1/lvtest
+  LV Name                 lvtest
+  VG Name                 Vol1
+  LV UUID                 4W2369-pLXy-jWmb-lIFN-SMNX-xZnN-3KN208
+  LV Write Access         read/write
+  LV Creation host, time  … -0400
+  LV Status               available
+  # open                  0
+  LV Size                 2.00 GiB
+  Current LE              513
+  Segments                1
+  Allocation              inherit
+  Read ahead sectors      auto
+  - currently set to      256
+  Block device            253:2
+
+# *** Stratis ***
+# In Stratis we have physical volumes, but instead of Volume groups we use volume Pools, and
+# then use FileSystem on top of it.
+# While LVM has defined size that needs to be changed, FileSystem’s min size is its current size
+# and its max size is the size of Volume Pool.
+
+physical volume /dev/sda 200 GB =>                          
+                                    Volume Pool 400GB  => [Stratis File system, can change size]
+physical volume /dev/sdb 200 GB =>                         
+
+# to install Stratis
+yum install stratis-cli stratisd -y
+# start stratis
+systemctl enable stratis Volume Pool
+# show stratis pools
+stratis pool list
+
+# add more physical drives (/dev/xvdc) to stratis volume pool1
+stratis pool add-data pool1 /dev/xvdc
+# create filesystem on the pool
+stratis filesystem create pool1 filesys1
+# show all filesystems
+stratis filesystem list
+
+# mount stratis filesystem to a folder
+mount /stratis/pool1/filesys1 /test
+
+# get an snapshot of the filesystem drive
+stratis filesystem snapshot pool1 filesys1 filesys1-copy
+
 
 # you have to put around 1GB of hard disk aside for the /boot folder, where kernel is located at.
 
-partition design for server machine:
-
+# partition design for server machine:
 total : 1TB
 swap: ram+2gb | /boot 1gb | /var 30 gb for server logs | /home 900gb | /usr 20 gb
 
