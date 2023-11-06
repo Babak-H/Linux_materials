@@ -1073,6 +1073,105 @@ cat /etc/timezone
 sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
 #==========================================
+# HTTP STATUS Codes
+
+Sucessful
+# 200 => ok 
+# 201 => post created
+# 204 => no content
+
+Redirection
+# 301 => moved permanently
+# 302 => found (temporarily)
+
+Client Error (incorrect request)
+# 400 => Bad Request
+# 401 => Unauthorized
+# 403 => Forbidden
+# 404 => Not Found
+
+Server Errors
+# 500 => Internal server error
+# 501 => Not implemented
+# 502 => Bad Gateway
+# 503 => Service Unavailable
+# 504 => Gateway Timeout
+
+#==========================================
+# Different Server Types
+
+Web server
+# client --[http request]--> Server
+# client <--[http response]-- Server
+
+Mail server
+# sender --[SMTP]--> Mail server --[SMTP]--> another Mail server --> reciever
+
+DNS server
+# client sends DNS name to dns server
+# dns server sends back ip address
+# client accesses the target server via it's ip address
+
+Proxy server
+# user connects to proxy server, then proxy server sends request to target server
+# target server sends response to proxy server, then proxy server sends response to user.
+# so user is NOT directly connected to target server
+
+#==========================================
+# Network Protocol
+
+HTTP
+# for web browsing
+# - tcp connection
+# - http request
+# - http response
+
+HTTPS
+# for web browsing
+# - tcp connection
+# - public key
+# - private key
+# - encrypted data
+
+WebSocket
+# for livechat and real-time data transmission
+# - HTTP upgrade
+# - full duplex
+
+TCP (NO data loss)
+# for web browsing and email protocols
+# - syn
+# - syn+ack
+# - ack
+
+UDP (with data loss)
+# for vide conferencing
+# - request
+# - response
+
+SMTP
+# for sending/receiving emails
+# - smpt server
+
+FTP
+# for upload and download files
+# - control channel
+# - data channel
+
+#==========================================
+API Gateway
+# client --> API Gateway(single entry point) --> API I
+                                           --> API II
+                                           --> API III
+Reverse Proxy
+# client --> Reverse Proxy (hides server's address) --> Server
+
+Load Balancer
+# client --> LoadBalancer (divides traffic between identical server instances) --> nginx 1
+#                                                                              --> nginx 2
+#                                                                              --> nginx 3
+
+#==========================================
 # Install Jenkins (and Docker) Server on Linux 
 
 # install jenkins on ubuntu through docker
