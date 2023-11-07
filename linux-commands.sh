@@ -34,10 +34,34 @@ r    w      x
 # chmod [option] [permission] [file_name]
 chmod 777 notes.txt
 
+chmod -R 0777 /mydirectory # give access for read-write-execute to all files inside a directory
+
+chmod u+s,o-rwx myUserGroup myFile
+# o-rwx => removes read and wrirte and execute from others
+
+# u+s => adds the SetUID bit
+# when the program is executed, the process created will acquire all the privileges of the program's owner; the effective UID of the process will be the same as the UID 
+# of the owner of the program (most likely, that will be root). This allows someone who would not normally be able to do something to do it via this program.
+
+# chmod give access to only specific user
+# This sets permissions for specific users, without changing the ownership of the directory.
+setfacl -m u:<username>:rwx myfolder
+
+# another way is to set that user as owner of the file/folder, then give him the access
+sudo chown <username>: myfolder
+sudo chmod u+w myfolder
+
 # chown , CHange OWNership
 # chown [option] owner[:group] file(s)
 chown linuxuser2 filename.txt
 sudo chown Bob file.txt
+
+# make chown work recursively? change ownership file a specific file type in all sub-directories
+# Recursive mode only works on directories, not files, 
+find . -type f -name '*.pdf' | xargs chown <username>:<usergroup>
+
+# in Bash 4 and later we can do this:
+chown -R <username>:<usergroup> ./**/*.pdf
 
 #===============================================================
 # working with Files
@@ -87,6 +111,15 @@ mv old_filename.txt new_filename.txt
 mkdir Music/Songs
 mkdir Music/2020/Songs
 
+# -p flags makes sure all the parent folders are created in case they don't exist
+mkdir -p folder/subfolder/subsubfolder
+
+# create several duirectories at once
+mkdir dir_1 dir_2 dir_3
+
+# when creating a directory in unix user "$variable" instead of $variable
+mkdir -p "$deployDir"
+
 # rmdir  delete empty directory
 rmdir -p mydir/personal1
 
@@ -94,6 +127,12 @@ rmdir -p mydir/personal1
 rm file1 file2
 
 rm -r myfolder  # reccurently delete a folder and its content
+
+# how to install a .deb file
+sudo dpkg -i /path/to/deb/file
+sudo apt-get install -f
+# or
+sudo apt install ./name.deb
 
 # touch, create new file/ modify old file
 touch /home/username/new_file.txt
@@ -129,6 +168,9 @@ wc file.txt
 cat my-thesis.txt | tr W j
 # replace all lowerCase characters to upperCase 
 cat my-thesis.txt | tr "[:lower:]" "[:upper:]"
+
+a="Hi all"
+echo "$a" | awk '{print tolower($0)}'  # hi all
 
 # cut
 # divide the lines via "," and only show columns 2 and 3
@@ -205,6 +247,8 @@ $ cat /etc/shadow   # username:password (if it is * then user doesnt have a pass
 $ chage -l username # shows info about password expiration
 
 $ id username # shows info about user and its groups
+$ id -u ubuntu # 1000 show's the user's uid
+$ id -nu 1000 # ubuntu, shows username from uid
 
 # su [options] [username [argument]], allows you to run a program as a different user
 su -p babak
@@ -238,6 +282,7 @@ ssh user1@test.server.com -p 3322
 # first time tring to ssh, type "yes" to continue, then enter the password
 # private_key # in your local machine
 # public_key # in the remote machine
+# the collection of public and private key are called host keys
 
 # to make the ssh password-less
 # generate ssh key, -t : make sure using RSA, -b : byteSize
@@ -748,6 +793,9 @@ $ ps # PID TTY TIME CMD
 $ ps -e # shows all processes currently running on this machine
 $ ps -e | wc -l
 
+$ pstree # is another way of visualizing processes. It displays them in tree format. So, for example, your X server and graphical environment would appear under the display manager that spawned them.
+
+# Given a search term, pgrep returns the process IDs that match it
 $ pgrep calc | xargs kill # find all processes that contain the word "calc", then kill them all
 
 $ top # shows all the processes, sorts them based on cpu usage, press "q" to quit top
@@ -795,6 +843,29 @@ cat /etc/security/limits.conf  # how to change resource limits for users
 sudo service --status-all
 # same as
 systemctl status
+
+# PROC
+# Proc file system (procfs) is a virtual file system created on the fly when the system boots and is dissolved at the time of system shutdown. 
+# It contains useful information about the processes that are currently running, it is regarded as a control and information center for the kernel. 
+# The proc file system also provides a communication medium between kernel space and user space.
+
+# If we list the directories, you will find that for each PID of a process, there is a dedicated directory.
+ls -l /proc | grep '^d'
+
+# If we want to check information about the process with PID 3151, we can use the following command.
+ls -ltr /proc/3151
+
+# INIT process
+# init is parent of all Linux processes with PID or process ID of 1. It is the first process to start when a computer boots up and runs until 
+# the system shuts down. init stands for initialization. In simple words the role of init is to create processes from script 
+# stored in the file /etc/inittab
+
+/etc/inittab  # Specifies the init command control file
+
+# Stopping a postgresql instance
+sudo systemctl stop postgresql
+# only as last resort
+killall postgresqld
 
 #==========================================
 # CRON
@@ -877,6 +948,12 @@ ping google.com
 # wget , WWWW GET , download files from the internet
 # wget [option] [url]
 wget https://wordpress.org/latest.zip
+# To save the downloaded file under a different name, pass the -O option
+wget -O latest-hugo.zip https://github.com/gohugoio/hugo/archive/master.zip
+# download a file to a specific directory
+wget -P /mnt/iso http://mirrors.mit.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso
+# Limiting the Download Speed, m is for megabyte
+wget --limit-rate=1m https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
 
 # hostname, know the system’s hostname and ip address
 hostname
@@ -931,7 +1008,13 @@ ip route # shows the routing table of the system (works same as AWS route tables
 traceroute 4.2.2.4  # trace from which ip it starts to end up connecting to this ip (for example for ping)
 
 netstat -nr # shows the routing table
+
 netstat -na # shows all the active ports on the machine (for both internet connections and unix sockets)
+
+netstat -l # shows all currently listening (using) ports
+
+netstat -tulnp | grep <port no> # If it shows some process its used. Its closed(not used) if there is no output
+
 nc -l 1337 # nc : netcat , shows all the connections on port 1377 on this machine
 
 sudo fuser 22/tcp  # find out which user is using port 22 (on tcp layer) on this machine
@@ -955,6 +1038,16 @@ $ getent hosts localhost
 $ getent hosts
 
 $ cat /etc/services  # shows all the ports (and their related services) that the linux machine is using
+
+# DHCP
+# DHCP, abbreviation of "Dynamic Host Control Protocol", is a network protocol that assigns IP addresses automatically to 
+# client systems in the network. This reduces the tedious task of manually assigning IP addresses in a large network that has 
+# hundreds of systems. We can define the IP range (Scopes) in the DHCP server, and distribute them across the network. 
+# The client systems in the network will automatically get the IP address.
+# https://help.ubuntu.com/community/Internet/ConnectionSharingDHCP3
+
+# to install DHCP server on ubuntu
+sudo apt-get install isc-dhcp-server
 
 #==========================================
 # LINKS
@@ -1076,6 +1169,14 @@ systemd-run --on-active="2hours" --unit="my-test-serv.service"
 systemd-run --on-active="3hours" /usr/local/bin/test-script.sh
 
 #==========================================
+# Encode and Decode
+
+# encode an image with base64
+myImgStr=$(base64 image1.jpg)
+# decode the encoded file
+base64 -d <<< "$myImgStr" > image2.jpg
+
+#==========================================
 # LINUX OS System
 
 # Linxu folder Structure
@@ -1165,6 +1266,18 @@ cat /etc/timezone
 # change your timezone to Tokyo
 sudo ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 
+#  stop GUI in ubuntu
+sudo service lightdm stop
+
+# How to uninstall programs in ubuntu if they are not in Software Center?
+sudo apt-get remove --purge <package-name>
+
+# The host name or computer name is usually at system startup in /etc/hostname file
+# to change the hostname
+sudo nano /etc/hostname # Delete the old name and setup new name
+sudo nano /etc/hosts # Replace any occurrence of the existing computer name with your new one
+sudo reboot # Reboot the system to changes take effect
+
 #==========================================
 # HTTP STATUS Codes
 
@@ -1178,7 +1291,7 @@ Redirection
 # 302 => found (temporarily)
 
 Client Error (incorrect request)
-# 400 => Bad Request
+# 400 => Bad Request, the server cannot or will not process the request due to something that is perceived to be a client error (for example, malformed request syntax, invalid request message framing, or deceptive request routing).
 # 401 => Unauthorized
 # 403 => Forbidden
 # 404 => Not Found
@@ -1438,4 +1551,5 @@ ls -la  # should show both .bash_profile and .bashrc
 
 # to restart terminal after changing the .bashrc file
 source .bashrc
+
 #==========================================
