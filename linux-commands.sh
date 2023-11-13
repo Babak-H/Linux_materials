@@ -169,21 +169,67 @@ cat my-thesis.txt | tr W j
 # replace all lowerCase characters to upperCase 
 cat my-thesis.txt | tr "[:lower:]" "[:upper:]"
 
+
+# AWK, scans each input file for lines (this commands goes through a file line-by-line) thath match any of the set patterns
+# print matched lines
+awk '/byego/ {print}' test.log
+# splits a line into two fields
+awk '{print $1,$3}' test.log
 a="Hi all"
 echo "$a" | awk '{print tolower($0)}'  # hi all
-
-# cut
-# divide the lines via "," and only show columns 2 and 3
-cut -d, -f2,3 domains.csv
-
-var = "apple orange"
-# divide by space, then get column 2
-echo $var | cut -d' ' -f2  # orange
+# print lines with more than 10 characters
+awk 'length($0)>10' test.log
 
 var="apple orange"
 echo $var    # apple orange
 echo $var | awk '{print $1}'   # apple
 echo $var | awk '{print $2}'   # orange
+
+# cut, cuts out selected portions of each line from each file and writes them to the standard output
+# divide the lines via "," and only show columns 2 and 3
+cut -d, -f2,3 domains.csv
+# cut first 3 bytes
+cut -b 1,2,3 file.log
+# select second column delimited by a space
+cut -d " " -f 2 test.log
+# specify a character's position
+cut -c 1-8 test.log
+
+var = "apple orange"
+# divide by space, then get column 2
+echo $var | cut -d' ' -f2  # orange
+
+# SED, sed reads the specific files, modifying the input as specified by a list of commands
+# substitute a string, change bytego to go
+sed s/bytego/go/g test.log
+# replace second occurance
+sed s/bytego/go/2 test.log
+# replace the string on the fourth line
+sed '4 s/bytego/go/' test.log
+# replace string on a range of lines
+sed '2-4 s/bytego/go/' test.log
+
+# SORT, sorts text and binary files by line
+# output to a file
+sort -o output.txt input.txt
+# sort in reverse order
+sort -r test.log
+# sort numerically
+sort -n test.log
+# sort based on the third column
+sort -k -3n test.log
+# sort and remove duplicates
+sort -u test.log
+
+# UNIQ, reads the specified input file comparing adjecent lines and writes a copy of each unique input line to the output file
+# tell how many times a line is repeated
+uniq -c test.log
+# print repeated lines
+uniq -d test.log
+# print unique lines
+uniq -u test.log
+# compare case-insensitive
+uniq -i test.log
 
 # man, MANual , provides a user manual of any commands or utilities you can run in Terminal
 man ls
@@ -470,10 +516,20 @@ sudo updatedb
 find /home -name notes.txt
 find ./ -type d -name dir_name
 
-# grep , Global Regular Expression Print
+# grep , Global Regular Expression Print, searches any given input file, returning lines that match one or more patterns
 # grep [search string] [filename]
 grep blue notepad.txt
 grep Lord my-text.txt > jesus.log 
+# find file names that match
+grep -l "bytego" *.log
+# case insensitive word match in a file
+grep -wi "bytego" test.log
+# show line numbers
+grep -n "bytego" test.log
+# show file lines that do NOT match (don't contain the keyword)
+grep -v "bytego" test.log
+# search recursively in a dir
+grep -R "bytego" /home
 
 $ find / -type l # find all links in the whole system
 
