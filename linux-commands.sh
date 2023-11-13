@@ -1324,6 +1324,95 @@ Proxy server
 # so user is NOT directly connected to target server
 
 #==========================================
+# HTTP Request Methods
+
+GET
+# GET /v1/products/iphone  => retuns an http or json response, retrieve a sinlge item or a list of items
+# RESPONSE :
+# <HTML>
+#   <HEAD> iphone </HEAD>
+#   <BODY>
+#     ...
+#     ...
+#   </BODY>
+# </HTML>
+
+
+HEAD
+# HEAD /v1/products/iphone => Identical to Get but no Message Body in response
+
+# RESPONSE : 200 OK
+
+
+POST
+# POST /v1/users  => creates a new record, sends data via json (in older cases via http meta-data). 
+
+# request body:
+# {
+#   "name": "bob",
+#    "last_name" : "alexanderis",
+#   "email": "bob@gmail.com"
+# }
+
+# RESPONSE : 201 Created
+
+
+PUT 
+# PUT /v1/users/123 => updates an item (similar to post but changes the whole record with new info). 
+
+# request body: 
+# {
+#   "name": "bob",
+#   "email": "bob@gmail.com"
+# }
+
+# RESPONSE : 200 OK
+
+
+PATCH
+# PATCH /v1/users/123  => Partially modify a record (only one specific field like name or email, similar to POST)
+
+# request body: 
+# {
+#   "email": "bob@gmail.com"
+# }
+
+# RESPONSE : 200 OK
+
+
+DELETE
+# DELETE /v1/users/123  => deletes a record
+
+# RESPONSE : 200 OK, 204 NO CONTENT
+
+
+CONNECT
+# CONNECT xxx.com:80  => creates atwo-way connection with a proxy server
+
+# request
+# Host: xxx:80
+# proxy-authorization: basic
+# SDFGJOldskfn=12312
+
+# RESPONSE : 200 OK
+
+
+OPTIONS
+# OPTIONS /v1/users  => retuns a list of supported HTTP Methods
+
+# RESPONSE : 200 OK
+# Allow: GET, POST, DELETE, HEAD, OPTIONS
+
+
+TRACE
+# TRACE /index.html  => performs a message loop-back test, providing a debugging mechanism
+
+# RESPONSE: 
+# Host: xxxxx
+# via: 1.1.xxxxx:3221
+# X-forwarded-for: xx.xxxxx.x
+
+#==========================================
 # Network Protocol
 
 HTTP
