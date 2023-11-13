@@ -1472,12 +1472,16 @@ TRACE
 # Network Protocol
 
 HTTP
+# Hyper Text Transfer Protocol
+# plain text, layer 7 osi, insecure, port 80, light-weight
 # for web browsing
 # - tcp connection
 # - http request
 # - http response
 
 HTTPS
+# https = http + ssl/tls
+# encrypted-data, layer 4 of osi, key exchange, heavier than http, certificate authority, port 443
 # for web browsing
 # - tcp connection
 # - public key
