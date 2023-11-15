@@ -998,6 +998,7 @@ $ tail -c 10M logfile > newlogfile
 # Networking
 
 # ping , Packet INternet Groper
+# When you run ping , the ICMP protocol sends a datagram to the host you specify, asking for a response. ICMP is the protocol responsible for error handling on a TCP/IP network.
 # ping [option] [hostname_or_IP_address]
 ping google.com
 
