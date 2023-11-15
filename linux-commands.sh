@@ -1115,8 +1115,11 @@ hardLink # is a full copy of the file, still works if you delete the original, i
 
 $ ln myfile hard_link # creates a hard link named hard_link
 $ ls -i # you can see both original and hard link point to same inode
-$ unlink hard_link # delete the link 
+# each file and directory is connected to an Inode. 
+# when you can't save anything on your machine, even when "df -h" shows you have empty space, you can check to see how much Inode is free, if inodes are full, doesn't matter how much free space you have, it can happen when you have many small cache files.
+$ df -i
 
+$ unlink hard_link # delete the link 
 $ ln -s myfile soft_link # creates a soft link
 $ unlink soft_link
 
