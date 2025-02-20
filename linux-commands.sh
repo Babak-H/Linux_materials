@@ -1513,3 +1513,45 @@ ls -la  # should show both .bash_profile and .bashrc
 source .bashrc
 
 #==========================================
+# i was running a query on a linux node that connects to our postgres server, however the linux node got restarted, how can I find the process that is running the query on linux and see its results?
+
+# If the Linux node was restarted, any running processes, including your query, would have been terminated. Unfortunately, this means that the query process itself is no longer running, and you won't be able to directly retrieve its results from the terminated process.
+# Check PostgreSQL Logs: PostgreSQL logs may contain information about the query that was running. Check the PostgreSQL server logs to see if the query was logged before the node was restarted. The location of the logs can be found in the PostgreSQL configuration file (postgresql.conf) under the logdirectory and logfilename settings.
+# Check Application Logs: If the query was initiated by an application, check the application's logs to see if the query and its results were logged there.
+# Use a Transaction: In the future, consider running long or important queries within a transaction and logging the results or using a tool that can handle disconnections gracefully.
+
+# but this node was not the server itself, it was only a cli terminal with connection to postgres server, was my query still aborted?
+
+# If the Linux node that was acting as a client (CLI terminal) to connect to the PostgreSQL server was restarted, the connection to the PostgreSQL server would have been terminated. This means that any query that was running from that client session would have been aborted unless it was running in a way that allowed it to continue independently on the server.
+# Here’s what typically happens in such a scenario:
+# 1. Client-Server Connection: When you run a query from a client (like a CLI terminal), the query is sent to the PostgreSQL server for execution. The client maintains a connection to the server to receive results.
+# 2. Connection Termination: If the client node is restarted, the connection to the PostgreSQL server is lost. The server will detect this disconnection and will typically terminate any running queries associated with that session.
+# 3. Query Abortion: As a result, the query that was running would be aborted by the PostgreSQL server because the client session was terminated.
+# 4. Server-Side Operations: If the query was part of a larger transaction that was not committed, any changes made by the query would be rolled back.
+# To handle such situations in the future, consider the following:
+# Use Transactions: Wrap your queries in transactions to ensure atomicity. If a transaction is not committed, it will be rolled back automatically if the connection is lost.
+
+`sql
+BEGIN;  -- Start the transaction
+-- Your SQL query or queries
+UPDATE employees SET salary = salary * 1.1 WHERE department = 'Sales';
+COMMIT;  -- Commit the transaction to save changes
+`
+
+`sql
+BEGIN;  -- Start the transaction
+-- Your SQL query or queries
+UPDATE employees SET salary = salary * 1.1 WHERE department = 'Sales';
+-- If something goes wrong or you need to cancel the changes
+ROLLBACK;  -- Rollback the transaction to undo changes
+`
+
+# if i make a transaction and cli node gets restarted, the query will still continue?
+
+# If you start a transaction and the client node (CLI) gets restarted, the transaction will not continue to execute on the PostgreSQL server. Instead, the transaction will be aborted, and any uncommitted changes will be rolled back. This is because the connection between the client and the server is lost when the client node is restarted, and PostgreSQL will terminate any active transactions associated with that connection.
+# 1. Transaction Start: You begin a transaction and execute one or more queries.
+2. Connection Loss: If the client node is restarted, the connection to the PostgreSQL server is lost.
+
+3. Transaction Abortion: PostgreSQL detects the lost connection and automatically rolls back any active transactions associated with that session. This ensures that the database remains in a consistent state and that no partial changes are applied.
+
+4. No Continuation: The transaction does not continue to execute on the server because it relies on the client connection to manage the transaction state.
