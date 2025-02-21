@@ -1607,3 +1607,18 @@ sql
 SELECT pgbackgroundlaunch('SELECT * FROM my_table');
 -- Assume the handle returned is '12345'
 SELECT * FROM pgbackgroundresult('12345');
+
+
+# postgres table vaccuming => In PostgreSQL, table vacuuming is a maintenance operation that helps manage storage and improve database performance. The process involves cleaning up dead tuples (obsolete rows) that result from updates and deletes.
+# 1. MVCC (Multi-Version Concurrency Control): PostgreSQL uses MVCC to handle concurrent transactions. When a row is updated or deleted, the old version of the row is not immediately removed. Instead, a new version of the row is created, and the old version is marked as obsolete or "dead." This allows other transactions to continue accessing the old version until they are completed.
+# 2. Dead Tuples: Over time, as updates and deletes occur, the number of dead tuples in a table can increase. These dead tuples consume storage space and can lead to inefficient use of resources, as they still need to be scanned during certain operations.
+# 3. Vacuuming: The 'VACUUM' command is used to reclaim storage occupied by dead tuples. It marks the space occupied by these tuples as available for future use, effectively cleaning up the table. Vacuuming also helps update the visibility map, which can improve the efficiency of index-only scans.
+# Regular vacuuming is essential for maintaining the health and performance of a PostgreSQL database, especially in environments with frequent updates and deletes.
+# basic vaccum
+VACUUM;
+# Vacuum a Specific Table
+VACUUM my_table;
+# vaccum with analyze => ANALYZE option updates the statistics used by the PostgreSQL query planner, which can help improve query performance. This command vacuums and analyzes a specific table
+VACUUM ANALYZE my_table;
+# vaccum full => The FULL option reclaims more space by compacting the table, but it requires an exclusive lock on the table. Use this option with caution, as it can impact performance
+VACUUM FULL my_table;
