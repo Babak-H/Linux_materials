@@ -1549,9 +1549,61 @@ ROLLBACK;  -- Rollback the transaction to undo changes
 # if i make a transaction and cli node gets restarted, the query will still continue?
 
 # If you start a transaction and the client node (CLI) gets restarted, the transaction will not continue to execute on the PostgreSQL server. Instead, the transaction will be aborted, and any uncommitted changes will be rolled back. This is because the connection between the client and the server is lost when the client node is restarted, and PostgreSQL will terminate any active transactions associated with that connection.
-# 1. Transaction Start: You begin a transaction and execute one or more queries.
-2. Connection Loss: If the client node is restarted, the connection to the PostgreSQL server is lost.
+#  Transaction Start: You begin a transaction and execute one or more queries.
+# Connection Loss: If the client node is restarted, the connection to the PostgreSQL server is lost.
+# Transaction Abortion: PostgreSQL detects the lost connection and automatically rolls back any active transactions associated with that session. This ensures that the database remains in a consistent state and that no partial changes are applied.
+# No Continuation: The transaction does not continue to execute on the server because it relies on the client connection to manage the transaction state.
 
-3. Transaction Abortion: PostgreSQL detects the lost connection and automatically rolls back any active transactions associated with that session. This ensures that the database remains in a consistent state and that no partial changes are applied.
+# To handle situations where you might lose the client connection, consider the following strategies: Background Processing: For long-running operations, consider using background processing or job queues that can handle disconnections more gracefully.
+# Use a Job Queue System
+# Job queue systems allow you to offload tasks to background workers. Popular job queue systems include: Celery, Sidekiq, Resque, RabbitMQ or Kafka
+pip install celery
+python
+from celery import Celery
+import psycopg2
 
-4. No Continuation: The transaction does not continue to execute on the server because it relies on the client connection to manage the transaction state.
+app = Celery('tasks', broker='redis://localhost:6379/0')
+
+@app.task
+def run_query():
+    conn = psycopg2.connect("dbname=test user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM my_table")
+    results = cur.fetchall()
+    conn.close()
+    return results
+   
+celery -A tasks worker --loglevel=info
+# Call the Task: From your application, you can call the task asynchronously.
+python
+result = run_query.delay()
+
+
+# Use Operating System Tools, You can use operating system tools to run scripts in the background:
+# Cron Jobs: Schedule scripts to run at specific intervals.
+# Systemd Services: Create a service that runs your script as a background process.
+#nohup: Run a command that continues executing after you log out.
+nohup psql -d mydb -c "SELECT * FROM my_table" > output.log &
+
+# how can I use pg_background extention to run my query?
+
+# The pgbackground extension in PostgreSQL allows you to run queries in the background, which can be useful for offloading long-running tasks.
+
+git clone https://github.com/vibhorkum/pg_background.git
+cd pg_background
+make
+sudo make install
+
+sql
+CREATE EXTENSION pg_background;
+
+# Start a Background Worker: Use the pgbackgroundlaunch function to start a background worker with your query.
+sql
+SELECT pgbackgroundlaunch('SELECT * FROM my_table');
+# Check the Status: You can check if the background query has completed using the pgbackgroundresult function.
+SELECT * FROM pgbackgroundresult(handle);
+# Retrieve Results: Once the query is complete, you can retrieve the results using the same pgbackgroundresult function.
+sql
+SELECT pgbackgroundlaunch('SELECT * FROM my_table');
+-- Assume the handle returned is '12345'
+SELECT * FROM pgbackgroundresult('12345');
