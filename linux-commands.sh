@@ -1622,3 +1622,14 @@ VACUUM my_table;
 VACUUM ANALYZE my_table;
 # vaccum full => The FULL option reclaims more space by compacting the table, but it requires an exclusive lock on the table. Use this option with caution, as it can impact performance
 VACUUM FULL my_table;
+
+
+# what is the difference between "sudo apt update" and "sudo apt-get update"?
+# The commands 'sudo apt update' and 'sudo apt-get update' are both used to update the package index on Debian-based systems like Ubuntu. However, there are some differences between apt and apt-get :
+# 1. Command Line Interface: 'apt' is a newer command-line interface that was introduced to provide a more user-friendly experience. It combines functionalities from apt-get and apt-cache and provides a more consistent and concise set of commands.
+# • apt-get is the older, more established command-line tool for managing packages.
+# 2. Output and User Experience: apt provides a more polished output with progress bars and colored text, making it easier to read and understand, apt-get provides more verbose output, which can be useful for scripting and debugging.
+# 3. Functionality: Both apt update and apt-get update perform the same function: they update the local package index with the latest information about available packages from the repositories. This is necessary before installing or upgrading packages to ensure you have the latest package information.
+# apt includes some additional features and commands that are not available in apt-get, such as apt list, apt show, and apt edit-sources.
+# 4. Intended Use: apt is intended for interactive use by end-users who want a simpler and more intuitive interface, apt-get is more suitable for scripts and automation, where consistent behavior and output are important.
+
