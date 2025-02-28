@@ -512,6 +512,9 @@ cat ca.pem >> fullchain.pem
 cp ca.pem /usr/local/share/ca-certificates/ca.crt
 sudo update-ca-certificates
 
+# The ca.crt file is typically a PEM-encoded X.509 certificate, which is a text file containing base64-encoded data. You can decode and view the contents of this certificate using various tools. Using OpenSSL: OpenSSL is a widely 
+# used tool for working with SSL/TLS certificates. You can use it to decode and display the contents of a certificate file.
+
 #========================================================
 # Searching
 
