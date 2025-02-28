@@ -1755,8 +1755,3 @@ auditctl
 auditctl -b 8192
 # sets the rate of generated messages per second:
 auditctl -r 0
-
-
-
-
- 
