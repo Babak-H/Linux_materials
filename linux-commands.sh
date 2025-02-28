@@ -478,6 +478,18 @@ openssl req -new -x509 -days 3650 -sha256 -key ca-key.pem -out ca.pem
 # view the public certificate
 openssl x509 -in ca.pem -text -noout
 
+openssl x509 -in ca.crt -text -noout
+
+# Check Certificate Fingerprint: To get the fingerprint of the certificate, which is a unique identifier, you can use
+openssl x509 -n ca.crt -noout -fingerprint
+# This command checks if the certificate can be verified against itself, which is typical for a root CA certificate.
+openssl verify -CAfile ca.crt ca.crt
+
+# Convert Certificate Format: If you need to convert the certificate from PEM to DER format, you can use:
+openssl x509 -in ca.crt -outform der -out ca.der
+# other way
+openssl x509 -in ca.der -inform der -out ca.crt -outform pem
+
 
 # create the self-signed certificate private key, no need to encrypt it here
 openssl genrsa -out cert-key.pem 4096
@@ -890,8 +902,12 @@ command 1 & command 2  # => This command will run command 1 in the background (a
 
 ulimit # shows how much cpu, ram, memory a user can have inside a machine
 ulimit -a  # show all
+# Find open files limit
+cat /proc/sys/fs/file-max
 
 cat /etc/security/limits.conf  # how to change resource limits for users
+    <username> soft nofile 4096
+    <username> hard nofile 4096
 
 # show all services that are available
 # + service is working
@@ -946,6 +962,18 @@ $ crontab -e # create crons in the file that opens:
 # only use one of these files:
 /etc/cron.allow # if you add a user here, only that user can use cron.
 /etc/cron.deny  # the user that is added here can't use cron.
+
+# create a cron schedule that runs every night at 3:30 am
+# To create a cron schedule that runs every night at 3:30 AM, you would use the following cron expression:
+30 3 * * *
+
+# Here's a breakdown of the cron expression:
+# 30 - This specifies the minute of the hour when the task should run (30 minutes past the hour).
+# 3 - This specifies the hour of the day when the task should run (3 AM).
+# * - This wildcard means "every" for the day of the month.
+# * - This wildcard means "every" for the month.
+# * - This wildcard means "every" for the day of the week.
+# So, this cron job will execute at 3:30 AM every day.
 
 #==========================================
 # Logs
@@ -1633,3 +1661,102 @@ VACUUM FULL my_table;
 # apt includes some additional features and commands that are not available in apt-get, such as apt list, apt show, and apt edit-sources.
 # 4. Intended Use: apt is intended for interactive use by end-users who want a simpler and more intuitive interface, apt-get is more suitable for scripts and automation, where consistent behavior and output are important.
 
+# I have a docker container that does not contain vim or nano for editing files. how can I create a shell file inside it and add a small 3 line script to that file? after executing that file I will need to edit it and add another 2 lines to the end of the file
+
+# If your Docker container doesn't have vim or nano for editing files, you can still create and edit files using basic shell commands like echo, cat, and printf. Here's how you can create a shell script, add content to it, and then modify it:
+# Create a Shell Script and Add Initial Content:
+# You can use cat with a here-document to create a file and add multiple lines to it. For example, to create a file named script.sh with 3 lines:
+cat << 'EOF' > my-script.sh
+#!/bin/bash
+echo "Line 1"
+echo "Line 2"
+echo "Line 3"
+EOF
+
+chmod +x script.sh
+
+echo 'echo "Line 4"' >> script.sh
+echo 'echo "Line 5"' >> script.sh
+
+
+-ecx
+# In Bash, the -ecx string is likely a combination of options that are being passed to the shell. Here's a breakdown of what each option typically means:
+# -e : This option tells the shell to exit immediately if any command within a script or a command sequence fails (i.e., returns a non-zero status). This is useful for error handling, as it prevents the script from continuing execution after an error occurs.
+# -c: This option is used to pass a command string to the shell. When you use bash -c  "command"
+# the shell executes the command string provided. This is often used to execute a
+# command or a series of commands from within a script or another program.
+# —X : This option enables a mode of the shell where all executed commands are printed to the terminal (standard error) before they are executed. This is useful for debugging, as it allows you to see exactly what commands are being run.
+# When combined as -ecx, these options would typically be used to run a command with error checking and debugging output enabled. However, the order of options doesn't matter, so -ecx is equivalent to —X —e -c.
+
+sleep
+# If you want to introduce a delay after executing a script in a piped command, you can use the sleep command to pause the execution for a specified amount of time. However, when dealing with piped commands, you need to ensure that the delay is applied correctly in the sequence of commands.
+# Here's how you can achieve a 3-minute delay after executing a script in a piped command:
+# Using a Subshell: You can use a subshell to execute the script and then introduce a delay before continuing with the next command in the pipeline.
+# In this example, the script is executed, and then sleep 180 introduces a 3-minute delay (180 seconds) before the output is piped to grep.
+(kubectl exec vault-tools-1 -n vault-operators-1 -- ./scripts/posting_failures.sh; sleep 180) | grep '"id":'
+
+# Using a Temporary File: Another approach is to redirect the output to a temporary file, introduce a delay, and then process the file.
+# This method captures the output in a file, waits for 3 minutes, processes the file with grep, and then removes the temporary file.
+kubectl exec vault-tools-1 -n vault-operators-1 -- ./scripts/posting_failures.sh > temp_output.txt
+sleep 180
+grep '"id":' temp_output.txt
+
+# To add a sleep command to wait 300 seconds between each curl request without changing anything else in your script, you can simply insert the sleep command right after the curl command within the xargs loop. Here's how you can do it:
+cat $EXPORTED_RESULT_FAILURES | jq -sr ".[] ${FAILURE_CONDITION} | .account_id" | uniq | xargs -I '{}' -n1 \
+ bash -c 'curl -k "${REPOSTING_URL}:republish" -X POST -H "X-Auth-Token: ${REPOSTING_TOKEN}" \
+ "Content-Type: Application/Json" \--data-binary "{\"account_id\": \"{}\",\"republish_type\": \"REPUBLISH_TYPE_REPUBLISH_BLOCKED_FAILURES\"}"; \
+ sleep 300'
+# I've wrapped the curl command and the sleep command in a bash -c block. This allows both commands to be executed as part of the same xargs iteration. The sleep 300 command will pause execution for 300 seconds after each curl request.
+
+# another way
+# Extract account IDs into an array
+account_ids=$(cat "$EXPORTED_RESULT_FAILURES" | jq -sr ".[] ${FAILURE_CONDITION} | .account_id" | uniq)
+# Iterate over each account ID
+for account_id in $account_ids; do
+  # Execute the curl command for each account ID
+  curl -k "${REPOSTING_URL}:republish" -X POST -H "X-Auth-Token: ${REPOSTING_TOKEN}" -H "Content-Type: Application/Json" --data-binary "{\"account_id\": \"${account_id}\",\"republish_type\": \"REPUBLISH_TYPE_REPUBLISH_BLOCKED_FAILURES\"}"
+  # Sleep for 300 seconds between requests
+  sleep 300
+done
+
+# what does " jq -sr ".[] ${FAILURE_CONDITION} " is doing here
+# uses jq, a command-line JSON processor, to extract and process data from a JSON file
+# jq -sr ".[] ${FAILURE_CONDITION} | .account_id": This part processes the JSON data using jq. Here's what each part does:
+# -s: This option tells jq to read the entire input as a single JSON array. This is useful when the input consists of multiple JSON objects, one per line.
+# -r: This option tells jq to output raw strings instead of JSON-encoded strings. This is useful when you want to use the output in shell scripts.
+# .[]: This part iterates over each element in the JSON array.
+# | .account_id: This part extracts the account_id field from each element that matches the FAILURE_CONDITION.
+# uniq: This command removes duplicate lines from the output. It assumes that the account_id values are sorted, or it will only remove consecutive duplicates.
+
+# These commands adjust the inotify limits on a Linux system
+# Helps applications that track changes in a large number of files, such as editors, IDEs, or file indexing services.
+# Increases the maximum number of inotify instances a user can create from its default (usually 128 or 1024) to 8192
+sysctl fs.inotify.max_user_instances=8192
+# Increases the maximum number of files a user can watch with inotify from its default (usually 8192 or 65536) to 524288
+sysctl fs.inotify.max_user_watches=524288
+
+lsof 
+# The lsof command is an acronym for "list open files," but its potential isn't limited to just that role. It's commonly said that in Linux, everything is a file. In many ways, that's true, so a utility that lists open files is actually pretty useful. The lsof utility is a robust interface for the information inside the /proc virtual filesystem.
+# what process is using a particular directory:
+lsof /run
+# what files a particular process has open:
+lsof -p 890
+
+# discover what files a particular user has open:
+lsof -u admin
+lsof /proc/{user-id}/fd | wc -l
+lsof -u {user} | wc -l
+
+
+auditctl
+# a utility to assist controlling the kernel's audit system. The Audit system operates on a set of rules  that define what is to be captured in the log files.
+# The "auditctl" command allows you to control the basic functionality of the Audit system and to define rules that decide which Audit events are logged.
+# sets the maximum amount of existing Audit buffers in the kernel:
+auditctl -b 8192
+# sets the rate of generated messages per second:
+auditctl -r 0
+
+
+
+
+ 
