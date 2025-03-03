@@ -1758,3 +1758,17 @@ auditctl
 auditctl -b 8192
 # sets the rate of generated messages per second:
 auditctl -r 0
+
+#  file descriptor (FD) 
+# A file descriptor (FD) is a unique identifier assigned by the operating system to track open files, sockets, or other I/O resources. It acts like a reference number that applications use to interact with files and network connections.
+# Used for More Than Just Files:
+
+# Regular files (e.g., logs, config files)
+# Network sockets (e.g., TCP, UDP connections)
+# Pipes and FIFOs (inter-process communication)
+# Device files (e.g., /dev/null, /dev/random)
+# Each Process Has a Limit
+
+# A process can only open a limited number of file descriptors.
+# This limit is set by the OS (e.g., ulimit -n on Linux).
+# If exceeded, errors like "Too many open files" occur.
