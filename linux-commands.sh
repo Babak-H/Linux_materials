@@ -1804,3 +1804,28 @@ keytool -list -keystore mykeystore.jks -storepass changeit
 # Import a certificate into a keystore
 keytool -importcert -file mycert.crt -keystore mykeystore.jks -alias mycert -storepass changeit
 
+# Delete matching files in all subdirectories
+# Remove all *.swp files underneath the current directory, use the find command in one of the following forms:
+find . -name \*.swp -type f -delete # The -delete option means find will directly delete the matching files. This is the best match
+
+# What's the difference in localhost vs 0.0.0.0?
+# What's the difference in telling a service to run on localhost:xxxx, 127.0.0.1:xxxx and 0.0.0.0:xxxx?
+# 127.0.0.1:xxxx is the normal loopback address, and localhost:xxxx is the hostname for 127.0.0.1:xxxx
+# localhost is a special virtual network interface, just like your ethernet or wifi each have a special interface.
+# 0.0.0.0 is slightly different, it's an address used to refer to all IP addresses on the same machine. Or no specific IP address.
+
+# What's the difference between <<, <<< and < < in bash?
+# << is known as here-document structure. You let the program know what will be the ending text, and whenever that delimiter is seen, the program will read all the stuff you've given to the program as input and perform a task upon it.
+wc << EOF
+one two three
+four five
+EOF
+2  5 24
+# In this example we tell wc program to wait for EOF string, then type in five words, and then type in EOF to signal that we're done giving input.
+
+# <<< is known as here-string. Instead of typing in text, you give a pre-made string of text to a program. For example, with such program as bc we can do bc <<< 5*4 to just get output for that specific case, no need to run bc interactively. Think of it as the equivalent of echo '5*4' | bc
+ls -l /proc/self/fd/ <<< "TEST"
+
+# < Process substitution feeds the output of a process (or processes) into the stdin of another process.So in effect this is similar to piping stdout of one command to the other , e.g. echo foobar barfoo | wc
+echo <(echo bar)
+
