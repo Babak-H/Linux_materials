@@ -1829,3 +1829,14 @@ ls -l /proc/self/fd/ <<< "TEST"
 # < Process substitution feeds the output of a process (or processes) into the stdin of another process.So in effect this is similar to piping stdout of one command to the other , e.g. echo foobar barfoo | wc
 echo <(echo bar)
 
+# What is the format for the PostgreSQL connection string / URL?
+postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
+
+postgresql://
+postgresql://localhost
+postgresql://localhost:5432
+postgresql://localhost/mydb
+postgresql://user@localhost
+postgresql://user:secret@localhost
+postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp
+postgresql://localhost/mydb?user=other&password=secret
