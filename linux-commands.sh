@@ -1772,3 +1772,35 @@ auditctl -r 0
 # A process can only open a limited number of file descriptors.
 # This limit is set by the OS (e.g., ulimit -n on Linux).
 # If exceeded, errors like "Too many open files" occur.
+
+# ** KeyStore ** 
+
+# A keystore is a secure storage mechanism used to hold cryptographic keys and certificates. In Java and many security-related applications, a keystore is used to manage keys and certificates for authentication, encryption, and secure communication.
+
+# Types of Keystores
+# Java supports different types of keystores, including:
+
+# JKS (Java KeyStore) – The traditional keystore format used by Java applications.
+# PKCS12 (Public-Key Cryptography Standards #12) – A more widely accepted format that can store both private and public keys.
+# BKS (Bouncy Castle Keystore) – Used for Android applications.
+# What a Keystore Contains
+# A keystore can store:
+
+# Private keys – Used in encryption and authentication.
+# Public key certificates – Issued by Certificate Authorities (CAs) to verify identities.
+# Secret keys – Used for symmetric encryption.
+
+# Common Uses of a Keystore
+# SSL/TLS Configuration – Java applications use keystores to store SSL/TLS certificates for secure communication.
+# Code Signing – Used to sign JAR files and APKs (for Android apps).
+# Authentication – Securely storing API keys and authentication credentials.
+# Keystore Management Using keytool
+# Java provides the keytool utility to create, manage, and manipulate keystores.
+
+# Create a new keystore:
+keytool -genkeypair -alias mykey -keyalg RSA -keystore mykeystore.jks -storepass changeit
+# List the contents of a keystore:
+keytool -list -keystore mykeystore.jks -storepass changeit
+# Import a certificate into a keystore
+keytool -importcert -file mycert.crt -keystore mykeystore.jks -alias mycert -storepass changeit
+
