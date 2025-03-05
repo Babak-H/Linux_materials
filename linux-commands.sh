@@ -864,6 +864,8 @@ $ ps # PID TTY TIME CMD
 $ ps -e # shows all processes currently running on this machine
 $ ps -e | wc -l
 
+$ ps -ef # a detailed list of all running processes on a Unix-based system, e → Shows all processes (not just those belonging to the current user), -f → Displays a full-format listing with more details
+
 $ pstree # is another way of visualizing processes. It displays them in tree format. So, for example, your X server and graphical environment would appear under the display manager that spawned them.
 
 # Given a search term, pgrep returns the process IDs that match it
