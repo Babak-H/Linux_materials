@@ -1058,6 +1058,14 @@ curl https://www.google.com
 curl -I https://www.google.com  # only show header
 curl -H "X-Header: value" https://www.example.com
 
+curl -fsSL https://pkgs.k8s.io/core:/stable/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# -f => tells curl to fail silently on server errors, show no messages
+# -s => operate in silent mode, supress any messages
+# -S => show errors if the occur (works together with -s )
+# -L => follow any redirects
+# gpg => gnu privacy guard, tool for encryption and signing, here used to handle downloading gpg key
+# --dearmor => tells gpg to convert gpg key from ASCII-armored to binary format to use with APT package manager
+
 # nslookup , Queries internet domain name servers interactively.
 # nslookup [-option] [name] [server]
 nslookup www.google.com
