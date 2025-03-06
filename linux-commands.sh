@@ -1850,3 +1850,54 @@ postgresql://user@localhost
 postgresql://user:secret@localhost
 postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp
 postgresql://localhost/mydb?user=other&password=secret
+
+"postgres://YourUserName:YourPassword@YourHostname:5432/YourDatabaseName"
+postgres://postgress:PASS@db-1050-000ie-core-cnn-vt-cluster:5432
+
+SHOW GRANTS ON DATABASE "ht-restore";
+GRANT ALL ON TABLE "ht-restore".vault_kv_store TO hault;
+SHOW GRANTS ON DATABASE "ht-restore".vault_kv_store;
+
+SHOW USERS;
+CREATE USER test_1 WITH LOGIN PASSWORD '$tr0nGpassW0rD' VALID UNTIL '2021-10-10';
+CREATE USER test_2 WITH PASSWORD NULL;
+
+REVOKE CREATE,INSERT,UPDATE ON test.customers FROM test_user;
+DROP USER test_user;
+
+DROP EXTENSION IF EXISTS pg_stat_statements;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+
+psql -h $DB_HOST -U $DB_USERNAME -c "ALTER USER vault_admin WITH PASSWORD '$DB_NEWPASS';"
+psql -X -A -h $DB_HOST -U $DB_USERNAME -t -c "SELECT 1 FROM pg_catalog.pg_roles WHERE rolname='vt_admin';"
+# -X → Disables reading the .psqlrc file (which contains user-specific configurations).
+# -A → Enables unaligned output format (removes extra spaces, making output easier to parse in scripts).
+# -h $DB_HOST → Specifies the database host ($DB_HOST is a variable holding the hostname).
+# -U $DB_USERNAME → Specifies the database user ($DB_USERNAME is a variable for the username).
+# -t → Removes headers and extra formatting from the output (useful when scripting).
+# -c "<SQL_QUERY>" → Executes the provided SQL command.
+
+# pg_catalog.pg_roles → A system catalog table in PostgreSQL that stores information about roles (users and groups).
+# WHERE rolname='vt_admin' → Filters the result to check if a role named 'vt_admin' exists.
+# SELECT 1 → Instead of retrieving full role details, it simply returns 1 if the role exists.
+
+psql -h $DB_HOST -U $DB_USERNAME -c "GRANT rds_superuser TO vault_admin;"
+
+export VTOKEN=`curl -k -s --request POST \
+  --data '{"jwt": "'$K8T'", "role": "vt-operator-role"}' \
+  https://ht.1050-core-vt.svc.cluster.local:8200/v1/auth/kubernetes/login | jq -r '.auth.client_token'`
+# -k → Ignores SSL certificate verification (useful for self-signed certificates in internal Kubernetes services).
+# -s → Runs silently (hides progress/output unless there's an error).
+# --request POST → Sends a POST request.
+# 3. --data '{"jwt": "'$K8T'", "role": "vt-operator-role"}'
+# Sends JSON payload to authenticate with Vault's Kubernetes authentication backend.
+# "$K8T" → Uses the value of the shell variable K8T, which presumably holds a Kubernetes service account token.
+# "role": "vt-operator-role" → Specifies the Vault role to use (vt-operator-role), which determines permissions inside Vault.
+# https://ht.1050-core-vault.svc.cluster.local:8200/v1/auth/kubernetes/login
+# The Vault Kubernetes authentication endpoint.
+# The URL suggests this Vault service (ht.1050-core-vault.svc.cluster.local) is running inside a Kubernetes cluster.
+# Port 8200 is Vault's default API port.
+# | jq -r '.auth.client_token'
+# jq → A command-line JSON processor.
+# -r → Outputs raw strings (removes quotes around the extracted value).
+# .auth.client_token → Extracts the client_token from Vault’s JSON response.
