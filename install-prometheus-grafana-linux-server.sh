@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Install Prometheus
 
 sudo useradd \
@@ -38,30 +40,30 @@ rm -rf prometheus*
 sudo vim /etc/systemd/system/prometheus.service
 
 ####################################  prometheus.service file
-[Unit]
-Description=Prometheus
-Wants=network-online.target
-After=network-online.target
+  [Unit]
+  Description=Prometheus
+  Wants=network-online.target
+  After=network-online.target
 
-StartLimitIntervalSec=500
-StartLimitBurst=5
+  StartLimitIntervalSec=500
+  StartLimitBurst=5
 
-[Service]
-User=prometheus
-Group=prometheus
-Type=simple
-Restart=on-failure
-RestartSec=5s
-ExecStart=/usr/local/bin/prometheus \
-  --config.file=/etc/prometheus/prometheus.yml \
-  --storage.tsdb.path=/data \
-  --web.console.templates=/etc/prometheus/consoles \ 
-  --web.console.libraries=/etc/prometheus/console_libraries \
-  --web.listen-address=0.0.0.0:9090 \  # where should prometheus listen to
-  --web.enable-lifecycle  # allows prometheus to reload configuration without restarting the whole application
+  [Service]
+  User=prometheus
+  Group=prometheus
+  Type=simple
+  Restart=on-failure
+  RestartSec=5s
+  ExecStart=/usr/local/bin/prometheus \
+    --config.file=/etc/prometheus/prometheus.yml \
+    --storage.tsdb.path=/data \
+    --web.console.templates=/etc/prometheus/consoles \ 
+    --web.console.libraries=/etc/prometheus/console_libraries \
+    --web.listen-address=0.0.0.0:9090 \  # where should prometheus listen to
+    --web.enable-lifecycle  # allows prometheus to reload configuration without restarting the whole application
 
-[Install]
-WantedBy=multi-user.target
+  [Install]
+  WantedBy=multi-user.target
 ####################################
 
 # enable the prometheus service
@@ -108,25 +110,25 @@ node_exporter --version
 sudo vim /etc/systemd/system/node_exporter.service
 
 ####################################  node_exporter.service file
-[Unit]
-Description=Node Exporter
-Wants=network-online.target
-After=network-online.target
+  [Unit]
+  Description=Node Exporter
+  Wants=network-online.target
+  After=network-online.target
 
-StartLimitIntervalSec=500
-StartLimitBurst=5
+  StartLimitIntervalSec=500
+  StartLimitBurst=5
 
-[Service]
-User=node_exporter
-Group=node_exporter
-Type=simple
-Restart=on-failure
-RestartSec=5s
-ExecStart=/usr/local/bin/node_exporter \
-    --collector.logind
+  [Service]
+  User=node_exporter
+  Group=node_exporter
+  Type=simple
+  Restart=on-failure
+  RestartSec=5s
+  ExecStart=/usr/local/bin/node_exporter \
+      --collector.logind
 
-[Install]
-WantedBy=multi-user.target
+  [Install]
+  WantedBy=multi-user.target
 ####################################
 
 # enable the service, start it and check its status
@@ -188,13 +190,13 @@ to add data source for visualization:
 sudo vim /etc/grafana/provisioning/datasources/datasources.yaml
 
 ################################
-apiVersion: 1
+  apiVersion: 1
 
-datasources:
-  - name: Prometheus
-    type: prometheus
-    url: http://localhost:9090
-    isDefault: true
+  datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://localhost:9090
+      isDefault: true
 ################################
 
 # restart grafana to reload this new config
@@ -211,12 +213,12 @@ sudo apt-get install python3-bcrypt
 vim generate_password.py
 
 #######################
-import getpass
-import bcrypt
+  import getpass
+  import bcrypt
 
-password = getpass.getpass("password: ")
-hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-print(hashed_password.decode())
+  password = getpass.getpass("password: ")
+  hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+  print(hashed_password.decode())
 #########################
 
 # give it the custom password
@@ -227,19 +229,19 @@ python3 generate_password.py
 sudo vim /etc/prometheus/web.yml
 
 ###########################
----
-basic_auth_users:
-    admin: $2b$12$CVcceMyfix1Qa7Kupisfe.JVHXG.U4PWFUculUnGlxPrTlBxfNGRe
+  ---
+  basic_auth_users:
+      admin: $2b$12$CVcceMyfix1Qa7Kupisfe.JVHXG.U4PWFUculUnGlxPrTlBxfNGRe
 ###########################
 
 # next we have to update the prometheus service file for authentication to work
 sudo vim /etc/systemd/system/prometheus.service
 
 ##########################
-...
-ExecStart=/usr/local/bin/prometheus \
   ...
-  --web.config.file=/etc/prometheus/web.yml  #add it in the last line of ExecStart commaand
+  ExecStart=/usr/local/bin/prometheus \
+    ...
+    --web.config.file=/etc/prometheus/web.yml  #add it in the last line of ExecStart commaand
 ##########################
 
 # reload the service
@@ -255,18 +257,18 @@ sudo systemctl status prometheus
 sudo vim /etc/grafana/provisioning/datasources/datasources.yaml
 
 ###########################
----
-apiVersion: 1
+  ---
+  apiVersion: 1
 
-datasources:
-  - name: Prometheus
-    type: prometheus
-    url: http://localhost:9090
-    isDefault: true
-    basicAuth: true
-    basicAuthUser: admin
-    secureJsonData:
-      basicAuthPassword: devops123
+  datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://localhost:9090
+      isDefault: true
+      basicAuth: true
+      basicAuthUser: admin
+      secureJsonData:
+        basicAuthPassword: devops123
 #########################
 
 # then restart grafana for changes to take effect
@@ -275,13 +277,13 @@ sudo systemctl restart grafana-server
 # next we have to add username/password to the job section of prometheus config file, since prometheus needs authentication to scrape its own metrics
 sudo vim /etc/prometheus/prometheus.yml
 ###########################
-...
-  - job_name: "prometheus"
-    basic_auth:
-      username: admin
-      password: devops123
-    static_configs:
-      - targets: ["localhost:9090"]
+  ...
+    - job_name: "prometheus"
+      basic_auth:
+        username: admin
+        password: devops123
+      static_configs:
+        - targets: ["localhost:9090"]
 #########################
 
 # check to make sure there is no error
@@ -323,26 +325,26 @@ alertmanager --version
 sudo vim /etc/systemd/system/alertmanager.service
 
 ##################################
-[Unit]
-Description=Alertmanager
-Wants=network-online.target
-After=network-online.target
+  [Unit]
+  Description=Alertmanager
+  Wants=network-online.target
+  After=network-online.target
 
-StartLimitIntervalSec=500
-StartLimitBurst=5
+  StartLimitIntervalSec=500
+  StartLimitBurst=5
 
-[Service]
-User=alertmanager
-Group=alertmanager
-Type=simple
-Restart=on-failure
-RestartSec=5s
-ExecStart=/usr/local/bin/alertmanager \
-  --storage.path=/alertmanager-data \
-  --config.file=/etc/alertmanager/alertmanager.yml
+  [Service]
+  User=alertmanager
+  Group=alertmanager
+  Type=simple
+  Restart=on-failure
+  RestartSec=5s
+  ExecStart=/usr/local/bin/alertmanager \
+    --storage.path=/alertmanager-data \
+    --config.file=/etc/alertmanager/alertmanager.yml
 
-[Install]
-WantedBy=multi-user.target
+  [Install]
+  WantedBy=multi-user.target
 ##################################
 
 # enable and start alertmanager service
