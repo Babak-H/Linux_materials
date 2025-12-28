@@ -15,7 +15,7 @@ read_files() {
         read_files "${file}"
       fi
       # If it's a file, append its contents to the output file
-      if [[-d "${file}" ]]; then
+      if [[ -d "${file}" ]]; then
         cat "${file}" >> "${OUTPUT_FILE}"
         # Add four empty lines
         echo -e '\n\n\n\n' >> "${OUTPUT_FILE}"

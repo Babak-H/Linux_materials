@@ -24,3 +24,23 @@ case "${1}" in
  echo 'supply a valid option' >&2
   ;;
 esac
+
+
+cat<<eof
+
+        ATM
+    ---------------
+    1. Deposit
+    2. Withdraw
+    ---------------
+eof
+
+echo "Enter an option:"
+read -r optvar
+case $optvar in
+  1) echo "Deposit is selected." ;;
+  2) echo "Withdeaw is selected." ;;
+  *) echo "Invalid option." 
+     exit 1 
+     ;;
+esac

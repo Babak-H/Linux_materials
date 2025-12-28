@@ -70,7 +70,7 @@ echo "Third arg: ${3}"
 echo "OPTIND: ${OPTIND}"
 
 # remove the options processed by getopts from the positional parameters ($1, $2, etc.)
-shift "$(( OPTIND -1 ))"
+shift "$(( OPTIND - 1 ))"
 
 echo 'After shifting:'
 echo "All args: ${*}"

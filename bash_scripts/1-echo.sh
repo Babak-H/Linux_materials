@@ -25,3 +25,7 @@ echo "This is ${WORD}${ENDING}."
 
 ENDING='s'
 echo "You are going to write many ${WORD}${ENDING}"
+
+firstname=David
+lastname=Webb
+fullname=$firstname" "$lastname

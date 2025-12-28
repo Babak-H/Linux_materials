@@ -196,6 +196,11 @@ done
 A=$(( 12+14 ))
 echo ${A}
 
+echo $(( 3+2*5))  # 13
+
+x=$(( (3+2)*5))
+echo $x  # 25
+
 D=2
 E=$(( D+2 ))
 echo ${E}
@@ -224,6 +229,10 @@ echo "$F"
 
 F=$(echo "1/3" | bc -l)
 echo "$F"  # Output: 0.3333333333333333
+
+echo $(( 8/3 )) # 2
+x=$(echo "scale=3; 8/3" | bc -l)
+echo "$x"  # 2.666
 
 
 
@@ -326,6 +335,9 @@ echo "${B[@]}"
 # The : -1 syntax means slice starting from index -1 (i.e., the last element), The space before -1 is required — without it, Bash would think :@ means something else
 echo "${B[@]: -1}"
 
+show fourth value in the names array
+echo "${names[3]}"
+
 # array with key-value pairs :
 declare -A myArray
 
@@ -354,6 +366,13 @@ declare -A model_metrics=([model_accuracy]=98 [model_name]='knn' [model_f1]=82)
 echo "${model_metrics[@]}"
 # print out just the keys of array
 echo "${!model_metrics[@]}"
+
+# POSIX shell doesnt't accept arrays, but we can define them this way there
+set - "Alice" "Bob" "Mary Jane" "Ted"
+
+echo "$1" # Alice
+echo "$4" # Ted
+echo "$@" # all values
 
 # this is a sign to show end of text and will not be shown  when you run the script
 cat << EndOfText

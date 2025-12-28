@@ -76,3 +76,32 @@ else
  log 'file backup failed'
  exit 1
 fi
+
+
+getname() {
+    read -r name
+    echo "$name"
+}
+
+echo "Enter your name: "
+echo "Your name is $(getname)"
+
+
+isalnum() {
+    case $1 in
+        [a-zA-Z]) return 0 ;;
+        [0-9]) return 1 ;;
+        *) return 2
+    esac
+}
+
+echo "Enter a single letter or number:"
+read -r inputchar
+
+if isalnum "$inputchar" ; then
+    echo "you entered a letter"
+elif [ $? -eq 1 ] ; then
+    echo "you entered a number."
+else
+    echo "you did not enter a single letter or number."
+fi

@@ -19,3 +19,6 @@ echo ${PASSWORD} | passwd --stdin ${USERNAME}
 # force user to change password on first login
 # -e : expire
 passwd -e ${USERNAME}
+
+# reading several arguments
+read -p "Enter usename and local name: " usernamevar namevar

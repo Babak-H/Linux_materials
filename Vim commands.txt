@@ -1,33 +1,11 @@
-Vi : opens VIM
 
-move through the screen:   
 
-k  up
-j  down
-h left
-l right
 
-w goes right word by word  | 2+w  goes 2 words ahead
-b goes back word by word | 3+b goes 3 words back
 
-shit + }    goes down faster
-shift + {   goes up faster
 
-ctrl + d   go Down fast
-ctrl + u   go Up fast
 
-when cursor is on a ( { [ press % (shift+5) to go to its pair
 
-0 : goes to start of the line
-$ (shift+4) : goes to end of the line
 
-quit vim : press "Esq"  then ":q" then enter
-quit vim:  hold shift, Z+Q  doesnt save changes
-quit vim: press "Esq" then ":wq" then enter to save and quit
-quit vim:  hold shift, Z+Z  save changes
-
-delete: press X to delete chracter under the cursor
-delete a word: press d+w to delete a word when you are in its first character
 d+$ (hold shift and 4) : delete from here until end of the line
 shift+D : delete from here until end of the line
 d+d : delete the whole line
@@ -100,6 +78,3 @@ R (hold shift+r) will replace current cursor character and all after it with wha
 spell check
 :setlocal spell! spelllang=en_us  : will spellcheck the whole document and show all misspells
 go to word, press z+= it will give you option to change that word.
-
-
-
