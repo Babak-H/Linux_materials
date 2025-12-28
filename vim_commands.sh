@@ -66,3 +66,77 @@ quit vim => press "Esq"  then ":q!" then enter, force quit
 quit vim => hold shift, ZQ  doesn't save changes
 
 :w!     force write (ignore file permissions) 
+
+
+d+$ (hold shift and 4) : delete from here until end of the line
+shift+D : delete from here until end of the line
+d+d : delete the whole line
+d+5+w : delete from here to 5 words forward
+d+2b+ : delete from here to 2 words backward
+d+i+( : deletes everything inside () , works for () in current line
+
+z+z : sends current line to middle of the screen
+
+press i to enter text
+press a to enter insert mode, one character after current cursor
+press Esq to exit typing mode
+o : start new paragraph and go to insert mode
+
+shift + A : start entering text at the end of current line
+shift + i : start entering text at the start of current line
+
+g+g : goes to the start of the file
+shift+g : goes to the bottom of the file
+
+u : undo the last action
+u+u : undo the last 2 actions
+:earlier 2m  : goes back to state of the file 2 minutes ago
+
+paste: press dd to delete a line, then press p to paste it in some other place
+(also works with other kinds of delete)
+
+delete and replace: use c instead of d, here we delete things but automatically go to inserting mode
+
+Ctrl+g : shows cursor's line and location in the file
+
+30% : goes to one third of the file
+50% : goes to middle of the file
+
+search:  press / then type word or character then press enter. it will go to first instance of it
+press n to go to next instance
+shift+n goes to previous instance
+? then type word then press enter: same as / but searches backwards
+
+replace
+:s/WordOne/WordTwo/   : replace word one with word two, for only one instance in current line
+:s/WordOne/WordTwo/g   : replace word one with word two, for all instances in current line
+:%s/WordOne/WordTwo/g  : replace word one with word two, all instances
+
+run external linux commands in vim:  :!ls : runs ls inside vim and shows result
+press enter to go back to vim
+
+Visually select
+v : will go to visual mode, you can select text by moving the cursor
+v+a+p : will select a whole paragraph
+
+Yanking
+press y after visually selecting a text, to save it in clipboard, press p to paste it
+yy : yanks a whole line to clipboard
+y+2+w : copy next 2 words, then press p to paste it somewhere
+
+hold Ctrl+v : another way of selecting text, in the rectangular way
+
+change 
+c is command for change, c+i+( find next () and deletes what is inside it and goes to insert mode
+
+norm
+if you do one operation on one line, select some other lines with v , then press : and type norm , 
+here you can do commands that apply to all of them. for example . means all of them will be applied 
+what you did in that first line.
+
+replace
+R (hold shift+r) will replace current cursor character and all after it with what you type
+
+spell check
+:setlocal spell! spelllang=en_us  : will spellcheck the whole document and show all misspells
+go to word, press z+= it will give you option to change that word.
