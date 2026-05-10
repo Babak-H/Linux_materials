@@ -595,6 +595,9 @@ find . -atime -1 -print
 # all filed edited in last day seconds in current dir
 find . -mtime -1 -print
 
+# finds and force-deletes .gz files older than 30 days under /var/logs/
+find /var/logs/ -name "*.gz" -mtime +30 | xargs rm -rf
+
 # \ can be used to prevent wildcard characters being interpreted by the shell, instead find will read them
 # find all files in home directory ending in *.txt
 find ~ -name \*.txt -print
@@ -2411,3 +2414,37 @@ auditctl -r 0
 which -a touch
 # /usr/bin/touch
 # /bin/touch
+
+# =======================================================
+
+# scenario 1
+
+ls -R
+
+find . -type f -name "*.txt" | xargs cat | grep "ERROR" | sort -k4 | uniq -f3 >> errors.log
+
+mkdir /Users/babak/backup
+
+find . -type f -name "*.txt" -exec cp {} /Users/babak/backup \;
+
+find . type f -name "*.txt" -exec rsync -R {} /Users/babak/backup \;
+
+# =======================================================
+
+# scenario 2
+
+ls -la
+
+cat error.log | grep Database >> database_errors.txt
+
+cat database_errors.txt | grep "connection refused" | wc -l
+
+find / -name "*.conf*" | grep db 
+
+diff db.conf db.conf.backup
+
+curl -I http://localhost:5432
+
+chmod 644 db.conf
+
+# =======================================================

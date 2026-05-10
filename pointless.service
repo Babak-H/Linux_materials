@@ -1,15 +1,21 @@
-[UNIT]
-Description=My Pointless Service # some description about the service
-After=network.target # only run the service when network connection exists
+[Unit]
+# Some description about the service
+Description=My Pointless Service
+# Only run the service after the network target has been reached
+After=network.target
 
 [Service]
-ExecStart = /home/babak/pointless.sh   # where executable service exists
-Restart=always   # in case of error restart the service 
-# user,group,home address for who runs this service
-WorkingDirectory=/home/babak  
+# Where the executable service exists
+ExecStart=/home/babak/pointless.sh
+# In case of error restart the service
+Restart=always
+# User, group, and working directory for who runs this service
+WorkingDirectory=/home/babak
 User=babak
 Group=babak
-Environment=GOPATH=/home/babak/go USERNAME=babak_g  # environment variables, separate them with space
+# Environment variables, separated with spaces
+Environment=GOPATH=/home/babak/go USERNAME=babak_g
 
 [Install]
-WantedBy=multi-user.target  # this will allow service to be installed for all users
+# This will allow the service to be installed for the standard multi-user target
+WantedBy=multi-user.target
