@@ -197,6 +197,11 @@ curl -X POST \
   https://example.com/api
 ```
 
+Fail the build if the app health endpoint does not return success after 5 retires
+```bash
+curl --fail --show-error --silent --retry 5 --retry-delay 10 "$HEALTH_URL"
+```
+
 Useful options:
 
 | Option | Meaning |
